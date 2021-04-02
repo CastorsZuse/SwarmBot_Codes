@@ -65,6 +65,10 @@ decode_results results;
 unsigned long current_code = 0;
 boolean runFlag = false;
 
+// TIMER
+unsigned long activationTime = 0;
+unsigned long timeout_ms = 10000;
+
 //Control IR numbers
 const long iRIN_ACTIVATION = 16761405;
 const long iRIN_botSTOP_R =  16724175;
@@ -177,6 +181,7 @@ void BOT_NOPE_RIGHT () {
 }
 
 void BOT_ObstacleAvoidance (){
+  
   BOT_ForwardFull();
   sensorRead ();
 
@@ -265,6 +270,11 @@ void setup() {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 void loop() {
+  if (runFlag && (millis() - activationTime) > timeout_ms) {
+        stop();
+        setLEDs(RED | GREEN | BLUE, true);
+  }  
+
   if (irrecv.decode(&results)) {
     current_code = results.value;
     Serial.print("New code received: ");
@@ -275,6 +285,7 @@ void loop() {
       case iRIN_ACTIVATION:
         Serial.println("BOT ACTIVATION");
         runFlag = true;
+        activationTime = millis();
         break;
 
       case iRIN_botSTOP_R:
