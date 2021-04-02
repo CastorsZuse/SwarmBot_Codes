@@ -36,12 +36,6 @@ const int LEDred = 13;
 const int LEDgreen = A2;
 const int LEDblue = A3;
 
-// BLINK Variables
-int ledState = LOW;   
-unsigned long previousMillis = 0; 
-const long interval = 300;
-
-
 enum Color : int {
   RED   = 1,
   GREEN = 2,
@@ -75,6 +69,12 @@ boolean runFlag = false;
 unsigned long activationTime = 0;
 unsigned long timeout_ms = 10000;
 
+// BLINK Variables
+int ledState = LOW; 
+unsigned long previousMillis = 0;
+const long interval = 300; 
+
+
 //Control IR numbers
 const long iRIN_ACTIVATION = 16761405;
 const long iRIN_botSTOP_R =  16724175;
@@ -100,22 +100,15 @@ void stop() {
   runFlag = false;
 }
 
-// colorValue should be a bitwise combination of Color values, such as
-// ( RED | BLUE ) for red and blue
-void setLEDs(int colorValue, bool neoValue) {
-  digitalWrite(LEDblue, BLUE & colorValue);
-  digitalWrite(LEDgreen, GREEN & colorValue);
-  digitalWrite(LEDred, RED & colorValue);
-  digitalWrite(NEOIO, neoValue);
-}
-
-void stopAndSetLEDs(int colorValue) {
-  stop();
-  setLEDs(colorValue, false);
-}
-
-void TIME_OUT_BLINK () {
-  unsigned long currentMillis = millis();
+void TIMEstop() {
+  digitalWrite(motorForwardLeft, LOW);
+  digitalWrite(motorBackLeft, LOW);
+  digitalWrite(motorForwardRight, LOW);
+  digitalWrite(motorBackRight, LOW);
+  analogWrite(motorEnableLeft, 0);
+  analogWrite(motorEnableRight, 0);
+  runFlag = false;
+   unsigned long currentMillis = millis();
 
   if (currentMillis - previousMillis >= interval) {
     // save the last time you blinked the LED
@@ -132,6 +125,22 @@ void TIME_OUT_BLINK () {
     digitalWrite(LEDred, ledState);
   }
 }
+
+// colorValue should be a bitwise combination of Color values, such as
+// ( RED | BLUE ) for red and blue
+void setLEDs(int colorValue, bool neoValue) {
+  digitalWrite(LEDblue, BLUE & colorValue);
+  digitalWrite(LEDgreen, GREEN & colorValue);
+  digitalWrite(LEDred, RED & colorValue);
+  digitalWrite(NEOIO, neoValue);
+}
+
+void stopAndSetLEDs(int colorValue) {
+  stop();
+  setLEDs(colorValue, false);
+}
+
+/////////////////////////////////////////////////
 
 void BOT_ForwardFull () {
   digitalWrite(motorForwardLeft, HIGH);
@@ -293,11 +302,9 @@ void setup() {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 void loop() {
-  
-      if (runFlag && (millis() - activationTime) > timeout_ms) {
-            stop();
-            TIME_OUT_BLINK();
-  }
+  if (runFlag && (millis() - activationTime) > timeout_ms) {
+        TIMEstop();
+      }
 
   if (irrecv.decode(&results)) {
     current_code = results.value;
