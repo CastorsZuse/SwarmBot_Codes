@@ -3,16 +3,14 @@
 // MULTI PLAYER RECEIVER CODE
 // BUMP CODE 
 // UPDATED TO SWICH/CASE FORMAT
-//////////////////////////////////////////////////////
-////////////////////////////////////////////////////
-// CONCEPT AND DESIGN BY: Nolan Cash
-// WRITEN BY: Nolan Cash
-// CoWRITEN BY: Andy Tracy
+// TIMER CODE
+//
 // SPECIAL THANKS TO:
+//      Andy Tracy
 //      Justus Stahler
 //      Christian Restifo
 //      CW Kreimer
-//      Steve Owens 
+//
 // See SwarmBots.online for more info // 
 
 //Pin numbers definition
@@ -35,12 +33,6 @@ const int NEOIO = A4;
 const int LEDred = 13;
 const int LEDgreen = A2;
 const int LEDblue = A3;
-
-enum Color : int {
-  RED   = 1,
-  GREEN = 2,
-  BLUE  = 4
-};
 
 //Variables for the Motors
 const int leftMotorSpeed = 255;
@@ -65,10 +57,6 @@ decode_results results;
 unsigned long current_code = 0;
 boolean runFlag = false;
 
-// TIMER
-unsigned long activationTime = 0;
-unsigned long timeout_ms = 10000;
-
 //Control IR numbers
 const long iRIN_ACTIVATION = 16761405;
 const long iRIN_botSTOP_R =  16724175;
@@ -80,9 +68,6 @@ const long iRIN_botSTOP_BG = 16734885;
 const long iRIN_BUMP_LEFT =  16753245;
 const long iRIN_STALL =      16736925;
 const long iRIN_BUMP_RIGHT = 16769565;
-const long iRIN_NOPE_LEFT =  16769055;
-const long iRIN_NOPE_BACK  = 16754775;
-const long iRIN_NOPE_RIGHT = 16748655;
 
 void stop() {
   digitalWrite(motorForwardLeft, LOW);
@@ -94,18 +79,17 @@ void stop() {
   runFlag = false;
 }
 
-// colorValue should be a bitwise combination of Color values, such as
-// ( RED | BLUE ) for red and blue
-void setLEDs(int colorValue, bool neoValue) {
-  digitalWrite(LEDblue, BLUE & colorValue);
-  digitalWrite(LEDgreen, GREEN & colorValue);
-  digitalWrite(LEDred, RED & colorValue);
+void setLEDs(bool blueValue, bool greenValue, bool redValue, bool neoValue) {
+  digitalWrite(LEDblue, blueValue);
+  digitalWrite(LEDgreen, greenValue);
+  digitalWrite(LEDred, redValue);
   digitalWrite(NEOIO, neoValue);
 }
 
-void stopAndSetLEDs(int colorValue) {
+
+void stopAndSetLEDs(bool blueValue, bool greenValue, bool redValue) {
   stop();
-  setLEDs(colorValue, false);
+  setLEDs(blueValue, greenValue, redValue, false);
 }
 
 /////////////////////////////////////////////////
@@ -117,7 +101,7 @@ void BOT_ForwardFull () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | GREEN | BLUE, true);
+  setLEDs(true, true, true, true);
 }
 
 void BOT_Left () {
@@ -127,7 +111,7 @@ void BOT_Left () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, 0);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(GREEN, true);
+  setLEDs(false, true, false, true);
 }
 
 void BOT_Right () {
@@ -137,7 +121,7 @@ void BOT_Right () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, 0);
-  setLEDs(GREEN, true);
+  setLEDs(false, true, false, true);
 }
 
 void BOT_Back () {
@@ -147,41 +131,10 @@ void BOT_Back () {
   digitalWrite(motorBackRight, HIGH);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(BLUE, true);
-}
-
-void BOT_NOPE_LEFT () {
-  digitalWrite(motorForwardLeft, LOW);
-  digitalWrite(motorBackLeft, HIGH);
-  digitalWrite(motorForwardRight, HIGH);
-  digitalWrite(motorBackRight, LOW);
-  analogWrite(motorEnableLeft, leftMotorSpeed);
-  analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | GREEN, true);
-}
-
-void BOT_NOPE_BACK () {
-  digitalWrite(motorForwardLeft, LOW);
-  digitalWrite(motorBackLeft, HIGH);
-  digitalWrite(motorForwardRight, HIGH);
-  digitalWrite(motorBackRight, LOW);
-  analogWrite(motorEnableLeft, leftMotorSpeed);
-  analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | BLUE, true);
-}
-
-void BOT_NOPE_RIGHT () {
-  digitalWrite(motorForwardLeft, HIGH);
-  digitalWrite(motorBackLeft, LOW);
-  digitalWrite(motorForwardRight, LOW);
-  digitalWrite(motorBackRight, HIGH);
-  analogWrite(motorEnableLeft, leftMotorSpeed);
-  analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | GREEN, true);
+  setLEDs(true, false, false, true);
 }
 
 void BOT_ObstacleAvoidance (){
-  
   BOT_ForwardFull();
   sensorRead ();
 
@@ -270,11 +223,6 @@ void setup() {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 void loop() {
-  if (runFlag && (millis() - activationTime) > timeout_ms) {
-        stop();
-        setLEDs(RED | GREEN | BLUE, true);
-  }  
-
   if (irrecv.decode(&results)) {
     current_code = results.value;
     Serial.print("New code received: ");
@@ -285,85 +233,55 @@ void loop() {
       case iRIN_ACTIVATION:
         Serial.println("BOT ACTIVATION");
         runFlag = true;
-        activationTime = millis();
         break;
-
+      
+      // LED argument order: blue, green, red
       case iRIN_botSTOP_R:
         Serial.println("botSTOP_RED");
-        stopAndSetLEDs(RED);
+        stopAndSetLEDs(false, false, true);
         break;
         
       case iRIN_botSTOP_G:
         Serial.println("botSTOP_GREEN");
-        stopAndSetLEDs(GREEN);
+        stopAndSetLEDs(false, true, false);
         break;
         
       case iRIN_botSTOP_B:
         Serial.println("botSTOP_BLUE");
-        stopAndSetLEDs(BLUE);
+        stopAndSetLEDs(true, false, false);
         break;
         
       case iRIN_botSTOP_RB:
         Serial.println("botSTOP_RED_BLUE");
-        stopAndSetLEDs(RED | BLUE);
+        stopAndSetLEDs(true, false, true);
         break;
         
       case iRIN_botSTOP_RG:
         Serial.println("botSTOP_RED_GREEN");
-        stopAndSetLEDs(RED | GREEN);
+        stopAndSetLEDs(false, true, true);
         break;
         
       case iRIN_botSTOP_BG:
         Serial.println("botSTOP_BLUE_GREEN");
-        stopAndSetLEDs(BLUE | GREEN);
+        stopAndSetLEDs(true, true, false);
         break;
         
       case iRIN_BUMP_LEFT:
-        if ( runFlag ) {
-          Serial.println("BOT_BUMP_LEFT");
-          BOT_Left();
-          delay(500);
-        }
+        Serial.println("BOT_BUMP_LEFT");
+        BOT_Left();
+        delay(500);
         break;
         
       case iRIN_BUMP_RIGHT:
-        if ( runFlag ) {
-          Serial.println("BOT_BUMP_RIGHT");
-          BOT_Right();
-          delay(500);
-        }
+        Serial.println("BOT_BUMP_RIGHT");
+        BOT_Right();
+        delay(500);
         break;
 
       case iRIN_STALL:
-        if ( runFlag ) {
-          Serial.println("BOT_STALL");
-          BOT_Back();
-          delay(500);
-        }
-        break;
-
-      case iRIN_NOPE_LEFT:
-        if ( runFlag ) {
-          Serial.println("NOPE_LEFT");
-          BOT_NOPE_LEFT();
-          delay (350);
-        }
-        break;
-
-      case iRIN_NOPE_BACK:
-        if ( runFlag ) {
-          Serial.println("NOOOOPE");
-          BOT_NOPE_BACK();
-          delay (800);
-        }
-        break;
-
-      case iRIN_NOPE_RIGHT:
-        if ( runFlag ) {
-          Serial.println("NOPE_RIGHT");
-          BOT_NOPE_RIGHT();
-          delay (350);
-        }
+        Serial.println("BOT_STALL");
+        BOT_Back();
+        delay(500);
         break;
 
       default:
