@@ -14,8 +14,23 @@
 //      CW Kreimer
 //      Steve Owens 
 // See SwarmBots.online for more info // 
-
-//Pin numbers definition
+//
+//////////// NOTES ////////////
+//
+// This code is the curent base code with working list above
+//  current issues:
+//      1:  when bot is zapped, and other zapper can zap it
+//          and change the RGB led color
+//            FIX: stop flags
+//      2:  needs LIBRARY update to 3.0 from 2.1
+//            FIX: notes in github
+//                 https://github.com/Arduino-IRremote/Arduino-IRremote
+//      3: needs blink without delay to happen on ledRED 
+//         after timeout_ms, till iRIN_ACTIVATION is receved 
+//            FIX: unknown 
+//
+//
+// Pin numbers definition
 const int motorEnableLeft = 9;
 const int motorForwardLeft = 7;
 const int motorBackLeft = 8;
