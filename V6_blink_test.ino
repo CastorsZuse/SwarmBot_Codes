@@ -18,18 +18,14 @@
 //
 //////////////////////// NOTES ///////////////////////////////
 //
-//    
-//
-//  current issues:
-//      1:  when bot is zapped, and other zapper can zap it
-//          and change the RGB led color
-//            FIX: stop flags
-//      2:  needs LIBRARY update to 3.0 from 2.1
-//            FIX: notes in github
-//                 https://github.com/Arduino-IRremote/Arduino-IRremote
-//      3: needs blink without delay to happen on ledRED 
-//         after timeout_ms, till iRIN_ACTIVATION is receved 
-//            FIX: unknown 
+//    working test code and history of issue 3  
+//         "needs blink without delay to happen on ledRED 
+//         after timeout_ms, till iRIN_ACTIVATION is receved"
+//    AREAS HASH FLAGGED FOR SCROLLING ///
+//     
+//            
+//     STUFF THAT DIDNT WORK
+//          
 //
 //
 
@@ -87,11 +83,11 @@ boolean runFlag = false;
 unsigned long activationTime = 0;
 unsigned long timeout_ms = 10000;
 
-// BLINK Variables
+// BLINK Variables////////////////////////////////////////////////////////////////////////////////////
 int ledState = LOW; 
 unsigned long previousMillis = 0;
 const long interval = 300; 
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Control IR numbers
 const long iRIN_ACTIVATION = 16761405;
@@ -117,7 +113,7 @@ void stop() {
   analogWrite(motorEnableRight, 0);
   runFlag = false;
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 void TIMEstop() {
   digitalWrite(motorForwardLeft, LOW);
   digitalWrite(motorBackLeft, LOW);
@@ -128,21 +124,16 @@ void TIMEstop() {
   runFlag = false;
    unsigned long currentMillis = millis();
 
-  if (currentMillis - previousMillis >= interval) {
-    // save the last time you blinked the LED
+  if (currentMillis - previousMillis >= interval) {  
     previousMillis = currentMillis;
-
-    // if the LED is off turn it on and vice-versa:
     if (ledState == LOW) {
       ledState = HIGH;
     } else {
       ledState = LOW;
     }
-
-    // set the LED with the ledState of the variable:
     digitalWrite(LEDred, ledState);
   }
-}
+} /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // colorValue should be a bitwise combination of Color values, such as
 // ( RED | BLUE ) for red and blue
@@ -316,8 +307,8 @@ void setup() {
   Serial.begin(9600);
 }
 
+////////////////////////////////////////////////////////////////////////// VOID LOOP ///////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
 
 void loop() {
   if (runFlag && (millis() - activationTime) > timeout_ms) {
