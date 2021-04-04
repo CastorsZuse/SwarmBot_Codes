@@ -15,6 +15,14 @@
 //      CW Kreimer
 //      Steve Owens 
 // See SwarmBots.online for more info // 
+//
+//////////// NOTES ////////////
+//
+//      working test code and history of issue 2
+//          needs LIBRARY update to 3.0 from 2.1
+//            FIX: notes in github
+//                 https://github.com/Arduino-IRremote/Arduino-IRremote
+//
 
 //Pin numbers definition
 const int motorEnableLeft = 9;
