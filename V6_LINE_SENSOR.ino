@@ -1,20 +1,18 @@
+//////////////////////////////////////////////////////////
 // SWARM BOTS: 
-// NEOPIXEL REMOTE ACTIVATION
 // MULTI PLAYER RECEIVER CODE
 // BUMP CODE 
 // UPDATED TO SWICH/CASE FORMAT
-//////////////////////////////////////////////////////
-////////////////////////////////////////////////////
-// CONCEPT AND DESIGN BY: Nolan Cash
-// WRITEN BY: Nolan Cash
-// CoWRITEN BY: Andy Tracy
-// SPECIAL THANKS TO:
-//      Justus Stahler
-//      Christian Restifo
-//      CW Kreimer
-//      Steve Owens 
 // See SwarmBots.online for more info // 
-
+//
+//
+// this is the debug code for the line following hardware
+// once attained, intigrate into the V6 base code
+// 
+// removed NEOIO to free up a4 pin
+//
+/////////////////////////////////////////////////////////
+//
 //Pin numbers definition
 const int motorEnableLeft = 9;
 const int motorForwardLeft = 7;
