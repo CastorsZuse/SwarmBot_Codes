@@ -5,14 +5,24 @@
 /////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
-//Pin numbers definition
+//Pin numbers definition  
+  const int motorEnableLeft    = 9;
   const int motorForwardLeft   = 7;  
   const int motorBackLeft      = 8; 
-  const int motorEnableLeft    = 9;
+  const int motorEnableRight   = 11;
   const int motorForwardRight  = 12; 
   const int motorBackRight     = 10; 
-  const int motorEnableRight   = 11;
 
+///////////////////////////////////////////////////////////////////////////////////
+//Line Sensor Connection
+  const int LEFT_LINE_SENSOR_PIN =A4;
+  const int RIGHT_LINE_SENSOR_PIN =A5;
+  const int THRESHOLD         = 900; 
+  
+  int LEFT_LINE_SENSOR_STATE;
+  int RIGHT_LINE_SENSOR_STATE;
+
+  ///////////////////////////////////////////////////////////////////////////////////
 //RGB LED pins
 const int LEDred = 13;
 const int LEDgreen = A2;
@@ -29,12 +39,7 @@ const int leftMotorSpeed = 255;
 const int rightMotorSpeed = 255;
 const int delayTime = 150;
   
-//Line Sensor Connection
-  const int LEFT_LINE_SENSOR_PIN =A4;
-  const int RIGHT_LINE_SENSOR_PIN =A5;
 
-  int LEFT_LINE_SENSOR_STATE;
-  int RIGHT_LINE_SENSOR_STATE;
 
 // (RED | GREEN | BLUE)
 void setLEDs(int colorValue) {
@@ -98,41 +103,37 @@ void setup() {
 }
 
 void loop() {
+  /////////////////////////////////////////////////////////////////////////////////////
   LEFT_LINE_SENSOR_STATE = analogRead(LEFT_LINE_SENSOR_PIN);
   RIGHT_LINE_SENSOR_STATE = analogRead(RIGHT_LINE_SENSOR_PIN);
 
-      if(RIGHT_LINE_SENSOR_STATE > 500 && LEFT_LINE_SENSOR_STATE < 500)
-     {
-  Serial.println("turning right");
-      BOT_Right();
-      delay(delayTime);
+      if(RIGHT_LINE_SENSOR_STATE > THRESHOLD && 
+          LEFT_LINE_SENSOR_STATE < THRESHOLD){
+        Serial.println("turning right");
+           BOT_Right();
+             delay(delayTime);
   }
-  
-      if(RIGHT_LINE_SENSOR_STATE < 500 && LEFT_LINE_SENSOR_STATE > 500)
-      {
-  Serial.println("turning left");
-      BOT_Left();
-      delay(delayTime);
+      if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && 
+         LEFT_LINE_SENSOR_STATE > THRESHOLD){
+        Serial.println("turning left");
+           BOT_Left();
+            delay(delayTime);
    }
-
-      if(RIGHT_LINE_SENSOR_STATE > 500 && LEFT_LINE_SENSOR_STATE > 500)
-      {
-  Serial.println("GO!");
-      BOT_ForwardFull();
-//      delay(delayTime);
-  }
-
-      if(RIGHT_LINE_SENSOR_STATE < 500 && LEFT_LINE_SENSOR_STATE < 500)
+      if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && LEFT_LINE_SENSOR_STATE < THRESHOLD)
       { 
   Serial.println("NOOOPE!!!");
          BOT_NOPE_BACK();
          delay(800);
   }
-
+  
+//      if(RIGHT_LINE_SENSOR_STATE > THRESHOLD && LEFT_LINE_SENSOR_STATE > THRESHOLD)
+//      {
+//  Serial.println("GO!");
+//      BOT_ForwardFull();
+//  //      delay(delayTime);
+//  }
  
 }
-
-
 
 
 
