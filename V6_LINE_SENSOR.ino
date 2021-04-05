@@ -1,17 +1,14 @@
-//////////////////////////////////////////////////////////
 // SWARM BOTS: 
+// NEOPIXEL REMOTE ACTIVATION
 // MULTI PLAYER RECEIVER CODE
 // BUMP CODE 
 // UPDATED TO SWICH/CASE FORMAT
-// See SwarmBots.online for more info // 
+//////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 //
+// THIS IS THE LINE FOLLOWING INTIGRADE 
+// FROM THE WORKING TEST CODE, FOR DEBUG
 //
-// this is the debug code for the line following hardware
-// once attained, intigrate into the V6 base code
-// 
-// removed NEOIO to free up a4 pin
-//
-/////////////////////////////////////////////////////////
 //
 //Pin numbers definition
 const int motorEnableLeft = 9;
@@ -28,9 +25,16 @@ const int trigPinRight = 5;
 const int echoPinRight = 6;
 const int irPin = A0;
 
-//const int NEOIO = A4;
+///////////////////////////////////////////////////////////////////////////////////
+//Line Sensor Connection
+  const int LEFT_LINE_SENSOR_PIN =A4;
+  const int RIGHT_LINE_SENSOR_PIN =A5;
+  const int THRESHOLD         = 900; 
+  
+  int LEFT_LINE_SENSOR_STATE;
+  int RIGHT_LINE_SENSOR_STATE;
 
-
+///////////////////////////////////////////////////////////////////////////////////
 
 //RGB LED pins
 const int LEDred = 13;
@@ -101,15 +105,12 @@ void setLEDs(int colorValue) {                  // , bool neoValue
   digitalWrite(LEDblue, BLUE & colorValue);
   digitalWrite(LEDgreen, GREEN & colorValue);
   digitalWrite(LEDred, RED & colorValue);
-//  digitalWrite(NEOIO, neoValue);
 }
 
 void stopAndSetLEDs(int colorValue) {
   stop();
-  setLEDs(colorValue, false);
+  setLEDs(colorValue);
 }
-
-/////////////////////////////////////////////////
 
 void BOT_ForwardFull () {
   digitalWrite(motorForwardLeft, HIGH);
@@ -118,7 +119,7 @@ void BOT_ForwardFull () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | GREEN | BLUE, true);
+  setLEDs(RED | GREEN | BLUE);
 }
 
 void BOT_Left () {
@@ -128,7 +129,7 @@ void BOT_Left () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, 0);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(GREEN, true);
+  setLEDs(GREEN);
 }
 
 void BOT_Right () {
@@ -138,7 +139,7 @@ void BOT_Right () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, 0);
-  setLEDs(GREEN, true);
+  setLEDs(GREEN);
 }
 
 void BOT_Back () {
@@ -148,7 +149,7 @@ void BOT_Back () {
   digitalWrite(motorBackRight, HIGH);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(BLUE, true);
+  setLEDs(BLUE);
 }
 
 void BOT_NOPE_LEFT () {
@@ -158,7 +159,7 @@ void BOT_NOPE_LEFT () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | GREEN, true);
+  setLEDs(RED | GREEN);
 }
 
 void BOT_NOPE_BACK () {
@@ -168,7 +169,7 @@ void BOT_NOPE_BACK () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | BLUE, true);
+  setLEDs(RED | BLUE);
 }
 
 void BOT_NOPE_RIGHT () {
@@ -178,11 +179,31 @@ void BOT_NOPE_RIGHT () {
   digitalWrite(motorBackRight, HIGH);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | GREEN, true);
+  setLEDs(RED | GREEN);
 }
 
 void BOT_ObstacleAvoidance (){
-  
+  LEFT_LINE_SENSOR_STATE = analogRead(LEFT_LINE_SENSOR_PIN);
+  RIGHT_LINE_SENSOR_STATE = analogRead(RIGHT_LINE_SENSOR_PIN);
+
+      if(RIGHT_LINE_SENSOR_STATE > THRESHOLD && 
+          LEFT_LINE_SENSOR_STATE < THRESHOLD){
+        Serial.println("turning right");
+           BOT_Right();
+             delay(delayTime);
+  }
+      if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && 
+         LEFT_LINE_SENSOR_STATE > THRESHOLD){
+        Serial.println("turning left");
+           BOT_Left();
+            delay(delayTime);
+   }
+      if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && LEFT_LINE_SENSOR_STATE < THRESHOLD)
+      { 
+  Serial.println("NOOOPE!!!");
+         BOT_NOPE_BACK();
+         delay(800);
+  }
   BOT_ForwardFull();
   sensorRead ();
 
@@ -261,7 +282,6 @@ void setup() {
   pinMode(LEDred, OUTPUT);
   pinMode(LEDgreen, OUTPUT);
   pinMode(LEDblue, OUTPUT);
-  pinMode(NEOIO, OUTPUT);
   
   irrecv.enableIRIn();
   Serial.begin(9600);
@@ -273,7 +293,7 @@ void setup() {
 void loop() {
   if (runFlag && (millis() - activationTime) > timeout_ms) {
         stop();
-        setLEDs(RED | GREEN | BLUE, true);
+        setLEDs(RED | GREEN | BLUE);
   }  
 
   if (irrecv.decode(&results)) {
