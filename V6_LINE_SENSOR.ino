@@ -198,11 +198,11 @@ void BOT_ObstacleAvoidance (){
            BOT_Left();
             delay(delayTime);
    }
-      if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && LEFT_LINE_SENSOR_STATE < THRESHOLD)
-      { 
-  Serial.println("NOOOPE!!!");
-         BOT_NOPE_BACK();
-         delay(800);
+      if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && 
+         LEFT_LINE_SENSOR_STATE < THRESHOLD){ 
+        Serial.println("NOOOPE!!!");
+           BOT_NOPE_BACK();
+            delay(800);
   }
   BOT_ForwardFull();
   sensorRead ();
