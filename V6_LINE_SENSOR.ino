@@ -183,6 +183,7 @@ void BOT_NOPE_RIGHT () {
 }
 
 void BOT_ObstacleAvoidance (){
+  //////////////////////////////////////////////////////////////////////////////////
   LEFT_LINE_SENSOR_STATE = analogRead(LEFT_LINE_SENSOR_PIN);
   RIGHT_LINE_SENSOR_STATE = analogRead(RIGHT_LINE_SENSOR_PIN);
 
@@ -204,6 +205,7 @@ void BOT_ObstacleAvoidance (){
            BOT_NOPE_BACK();
             delay(800);
   }
+///////////////////////////////////////////////////////////////////////////////////
   BOT_ForwardFull();
   sensorRead ();
 
