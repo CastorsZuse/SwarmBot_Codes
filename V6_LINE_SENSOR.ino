@@ -9,6 +9,13 @@
 // THIS IS THE LINE FOLLOWING INTIGRADE 
 // FROM THE WORKING TEST CODE, FOR DEBUG
 //
+//    4.5.21 STATUS: 
+//        line following ir sensors are working with
+//        a 10-15mm range. 
+//        turn functions are bing called and led is
+//        changing, however the L/R motor does not 
+//        stop. 
+//        its as if another function is pushing thru...
 //
 //Pin numbers definition
 const int motorEnableLeft = 9;
