@@ -1,29 +1,16 @@
 // SWARM BOTS: 
-// NEOPIXEL REMOTE ACTIVATION
 // MULTI PLAYER RECEIVER CODE
 // BUMP CODE 
 // UPDATED TO SWICH/CASE FORMAT
-// TIMER CODE
+// UPDATE TO .H_3.0 LIB
 //////////////////////////////////////////////////////
+//
+// iRIN_botSTOP_R NOT SETTING LED
+//
+// New code received: 0. ISSUE
+//
 ////////////////////////////////////////////////////
-// CONCEPT AND DESIGN BY: Nolan Cash
-// WRITEN BY: Nolan Cash
-// CoWRITEN BY: Andy Tracy
-// SPECIAL THANKS TO:
-//      Justus Stahler
-//      Christian Restifo
-//      CW Kreimer
-//      Steve Owens 
-// See SwarmBots.online for more info // 
-//
-//////////// NOTES ////////////
-//
-//      working test code and history of issue 2
-//          needs LIBRARY update to 3.0 from 2.1
-//            FIX: notes in github
-//                 https://github.com/Arduino-IRremote/Arduino-IRremote
-//
-
+// 
 //Pin numbers definition
 const int motorEnableLeft = 9;
 const int motorForwardLeft = 7;
@@ -70,6 +57,7 @@ const int stuckDistance = 10;
 //Variables for IR Sensor
 #define DECODE_NEC
 #include <IRremote.h>
+
 unsigned long current_code = 0;
 boolean runFlag = false;
 
@@ -78,19 +66,19 @@ unsigned long activationTime = 0;
 unsigned long timeout_ms = 10000;
 
 //Control IR numbers
-const long iRIN_ACTIVATION = 16761405;
-const long iRIN_botSTOP_R =  16724175;
-const long iRIN_botSTOP_G =  16718055;
-const long iRIN_botSTOP_B =  16743045;
-const long iRIN_botSTOP_RB = 16716015;
-const long iRIN_botSTOP_RG = 16726215;
-const long iRIN_botSTOP_BG = 16734885;
-const long iRIN_BUMP_LEFT =  16753245;
-const long iRIN_STALL =      16736925;
-const long iRIN_BUMP_RIGHT = 16769565;
-const long iRIN_NOPE_LEFT =  16769055;
-const long iRIN_NOPE_BACK  = 16754775;
-const long iRIN_NOPE_RIGHT = 16748655;
+const long iRIN_ACTIVATION = 3158572800;    //16761405;
+const long iRIN_botSTOP_R =  4077715200;    //16724175;
+const long iRIN_botSTOP_G =  3877175040;    //16718055;
+const long iRIN_botSTOP_B =  2707357440;    //16743045;
+const long iRIN_botSTOP_RB = 4144561920;    //16716015;
+const long iRIN_botSTOP_RG = 3810328320;    //16726215;
+const long iRIN_botSTOP_BG = 2774204160;    //16734885;
+const long iRIN_BUMP_LEFT =  3125149440;    //16753245;
+const long iRIN_STALL =      3108437760;    //16736925;
+const long iRIN_BUMP_RIGHT = 3091726080;    //16769565;
+const long iRIN_NOPE_LEFT =  4161273600;    //16769055;
+const long iRIN_NOPE_BACK  = 3927310080;    //16754775;
+const long iRIN_NOPE_RIGHT = 4127850240;    //16748655;
 
 void stop() {
   digitalWrite(motorForwardLeft, LOW);
@@ -116,6 +104,8 @@ void stopAndSetLEDs(int colorValue) {
   setLEDs(colorValue, false);
 }
 
+/////////////////////////////////////////////////
+
 void BOT_ForwardFull () {
   digitalWrite(motorForwardLeft, HIGH);
   digitalWrite(motorBackLeft, LOW);
@@ -125,6 +115,7 @@ void BOT_ForwardFull () {
   analogWrite(motorEnableRight, rightMotorSpeed);
   setLEDs(RED | GREEN | BLUE, true);
 }
+
 void BOT_Left () {
   digitalWrite(motorForwardLeft, LOW);
   digitalWrite(motorBackLeft, LOW);
@@ -134,6 +125,7 @@ void BOT_Left () {
   analogWrite(motorEnableRight, rightMotorSpeed);
   setLEDs(GREEN, true);
 }
+
 void BOT_Right () {
   digitalWrite(motorForwardLeft, HIGH);
   digitalWrite(motorBackLeft, LOW);
@@ -143,6 +135,7 @@ void BOT_Right () {
   analogWrite(motorEnableRight, 0);
   setLEDs(GREEN, true);
 }
+
 void BOT_Back () {
   digitalWrite(motorForwardLeft, LOW);
   digitalWrite(motorBackLeft, HIGH);
@@ -152,6 +145,7 @@ void BOT_Back () {
   analogWrite(motorEnableRight, rightMotorSpeed);
   setLEDs(BLUE, true);
 }
+
 void BOT_NOPE_LEFT () {
   digitalWrite(motorForwardLeft, LOW);
   digitalWrite(motorBackLeft, HIGH);
@@ -161,6 +155,7 @@ void BOT_NOPE_LEFT () {
   analogWrite(motorEnableRight, rightMotorSpeed);
   setLEDs(RED | GREEN, true);
 }
+
 void BOT_NOPE_BACK () {
   digitalWrite(motorForwardLeft, LOW);
   digitalWrite(motorBackLeft, HIGH);
@@ -170,6 +165,7 @@ void BOT_NOPE_BACK () {
   analogWrite(motorEnableRight, rightMotorSpeed);
   setLEDs(RED | BLUE, true);
 }
+
 void BOT_NOPE_RIGHT () {
   digitalWrite(motorForwardLeft, HIGH);
   digitalWrite(motorBackLeft, LOW);
@@ -181,7 +177,7 @@ void BOT_NOPE_RIGHT () {
 }
 
 void BOT_ObstacleAvoidance (){
-
+  
   BOT_ForwardFull();
   sensorRead();
 
@@ -207,8 +203,8 @@ void BOT_ObstacleAvoidance (){
     }
   }
 }
+
 void sensorRead () {
-  
   //Read front sensor value
   digitalWrite(trigPinFront, LOW);
   delayMicroseconds(2);
@@ -235,16 +231,17 @@ void sensorRead () {
   digitalWrite(trigPinRight, LOW);
   durationRight = pulseIn(echoPinRight, HIGH);
   distanceRight = durationRight * 0.034 / 2;
-  Serial.print("Left Sensor: ");
-  Serial.println(distanceLeft);
-  Serial.print("Right Sensor: ");
-  Serial.println(distanceRight);
-  Serial.print("Front Sensor: ");
-  Serial.println(distanceFront);
+
+//  Serial.print("Left Sensor: ");
+//  Serial.println(distanceLeft);
+//  Serial.print("Right Sensor: ");
+//  Serial.println(distanceRight);
+//  Serial.print("Front Sensor: ");
+//  Serial.println(distanceFront);
 }
 
 void setup() {
-
+  
   IrReceiver.begin(irPin, ENABLE_LED_FEEDBACK);     // NEW
   pinMode(motorEnableLeft, OUTPUT);
   pinMode(motorForwardLeft, OUTPUT);
@@ -262,12 +259,13 @@ void setup() {
   pinMode(LEDgreen, OUTPUT);
   pinMode(LEDblue, OUTPUT);
   pinMode(NEOIO, OUTPUT);
-
-  IrReceiver.enableIRIn();               
+  
+  IrReceiver.enableIRIn();                // unedited ////////////////////////////////////
   Serial.begin(9600);
 }
 
-//////////////////////////// VOID LOOP //////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 void loop() {
   if (runFlag && (millis() - activationTime) > timeout_ms) {
@@ -278,15 +276,14 @@ void loop() {
     current_code = IrReceiver.decodedIRData.decodedRawData;
     Serial.print("New code received: ");
     Serial.println(current_code);
-   IrReceiver.resume();                  
-    
+    IrReceiver.resume();                       
     switch (current_code) { 
       case iRIN_ACTIVATION:
         Serial.println("BOT ACTIVATION");
         runFlag = true;
         activationTime = millis();
         break;
-        
+
       case iRIN_botSTOP_R:
         Serial.println("botSTOP_RED");
         stopAndSetLEDs(RED);
@@ -332,7 +329,7 @@ void loop() {
           delay(500);
         }
         break;
-        
+
       case iRIN_STALL:
         if ( runFlag ) {
           Serial.println("BOT_STALL");
@@ -340,7 +337,7 @@ void loop() {
           delay(500);
         }
         break;
-        
+
       case iRIN_NOPE_LEFT:
         if ( runFlag ) {
           Serial.println("NOPE_LEFT");
@@ -348,7 +345,7 @@ void loop() {
           delay (350);
         }
         break;
-        
+
       case iRIN_NOPE_BACK:
         if ( runFlag ) {
           Serial.println("NOOOOPE");
@@ -356,7 +353,7 @@ void loop() {
           delay (800);
         }
         break;
-        
+
       case iRIN_NOPE_RIGHT:
         if ( runFlag ) {
           Serial.println("NOPE_RIGHT");
@@ -364,14 +361,13 @@ void loop() {
           delay (350);
         }
         break;
-        
+
       default:
-        
         break;
+    }
   }
-}
-  
-     if ( runFlag ) {
-        BOT_ObstacleAvoidance();
+
+  if ( runFlag ) {
+    BOT_ObstacleAvoidance();
   }
 }
