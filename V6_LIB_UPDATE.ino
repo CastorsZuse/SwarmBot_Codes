@@ -25,7 +25,6 @@ const int echoPinLeft = 4;
 const int trigPinRight = 5;
 const int echoPinRight = 6;
 const int irPin = A0;
-const int NEOIO = A4;
 
 //RGB LED pins
 const int LEDred = 13;
@@ -54,12 +53,13 @@ const int minFrontDistance = 30;
 const int minSideDistance = 20;
 const int stuckDistance = 10;
 
+///////////////////////////////////////////////////////// NEW {
 //Variables for IR Sensor
 #define DECODE_NEC
 #include <IRremote.h>
-
 unsigned long current_code = 0;
 boolean runFlag = false;
+////////////////////////////////////////////////////////// NEW }
 
 // TIMER
 unsigned long activationTime = 0;
@@ -240,7 +240,7 @@ void sensorRead () {
 
 void setup() {
   
-  IrReceiver.begin(irPin, ENABLE_LED_FEEDBACK);     
+  IrReceiver.begin(irPin, ENABLE_LED_FEEDBACK); ////////// NEW <
   pinMode(motorEnableLeft, OUTPUT);
   pinMode(motorForwardLeft, OUTPUT);
   pinMode(motorBackLeft, OUTPUT);
@@ -258,11 +258,13 @@ void setup() {
   pinMode(LEDblue, OUTPUT);
   pinMode(NEOIO, OUTPUT);
   
-  IrReceiver.enableIRIn();              
+  IrReceiver.enableIRIn(); /////////////////////////// NEW <           
   Serial.begin(9600);
 }
 
 void loop() {
+
+  /////////////////////////////////////////////////// NEW{
   if (runFlag && (millis() - activationTime) > timeout_ms) {
         stopAndSetLEDs(RED | GREEN | BLUE);
   }
@@ -271,7 +273,9 @@ void loop() {
     current_code = IrReceiver.decodedIRData.decodedRawData;
     Serial.print("New code received: ");
     Serial.println(current_code);
-    IrReceiver.resume();                       
+    IrReceiver.resume();        
+///////////////////////////////////////////////////// NEW}
+                   
     switch (current_code) { 
       case iRIN_ACTIVATION:
         Serial.println("BOT ACTIVATION");
