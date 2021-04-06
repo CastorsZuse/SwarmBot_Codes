@@ -372,11 +372,16 @@ void loop() {
         stopAndSetLEDs(BLUE | GREEN);
         break;
 
- //////////////////////////////////////////////////////
- ////////////// if ( runFlag ) && ( ZAPPED_Flag ) {      
+////////////////////////////////////////////////////
+// if ( runFlag ) && ( ZAPPED_Flag ) {      
+// if (( runFlag == true) && (ZAPPED_Flag == false){
+//      Set true and false to 1 0
+// if (runFlag > ZAPPED_Flag) {
+// if (runFlag < ZAPPED_Flag) {
+// if (runFlag = ZAPPED_Flag) {
 
       case iRIN_BUMP_LEFT:
-        if ( runFlag ) {
+        if ( runFlag ) {   // Replace all lines in relation 
           Serial.println("BOT_BUMP_LEFT");
           BOT_Left();
           delay(500);
