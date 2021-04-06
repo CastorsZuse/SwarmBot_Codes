@@ -16,6 +16,7 @@
 //        changing, however the L/R motor does not 
 //        stop. 
 //        its as if another function is pushing thru...
+//            and or delay between calls
 //        
 //        function triggers on white not black.
 //
@@ -81,7 +82,7 @@ boolean runFlag = false;
 
 // TIMER
 unsigned long activationTime = 0;
-unsigned long timeout_ms = 10000;   // 1000 = 1 second
+unsigned long timeout_ms = 90000;   // 1000 = 1 second
 
 //Control IR numbers
 const long iRIN_ACTIVATION = 16761405;
@@ -194,6 +195,19 @@ void BOT_NOPE_RIGHT () {
 void BOT_ObstacleAvoidance (){
              BOT_ForwardFull();
              sensorRead ();
+
+////////////////////////////////////////////////////////////////////
+/////////////// LINE FOLLOWING SENSOR AI TREE /////////////////////
+///////////////////////////////////////////////////////////////////
+
+//        (RIGHT_LINE_SENSOR_STATE > THRESHOLD && 
+//          LEFT_LINE_SENSOR_STATE < THRESHOLD){
+//          if the right sensor is high
+//             and left sensor is low
+//             bot will turn right 
+//          function triggetrs on white 
+////////////////////////////////////////////////////////////////
+
           LEFT_LINE_SENSOR_STATE = analogRead(LEFT_LINE_SENSOR_PIN);
           RIGHT_LINE_SENSOR_STATE = analogRead(RIGHT_LINE_SENSOR_PIN);
 
@@ -202,7 +216,7 @@ void BOT_ObstacleAvoidance (){
         Serial.println("turning right");
            BOT_Right();
              delay(delayTime);
-  }
+  }  
       if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && 
          LEFT_LINE_SENSOR_STATE > THRESHOLD){
         Serial.println("turning left");
@@ -216,7 +230,10 @@ void BOT_ObstacleAvoidance (){
             delay(800);
   }
 
-
+////////////////////////////////////////////////////////////////////
+/////////////// LINE FOLLOWING SENSOR AI TREE /////////////////////
+///////////////////////////////////////////////////////////////////
+  
   if ((distanceFront <= minFrontDistance) ||
       (distanceLeft <= minSideDistance) ||
       (distanceRight <= minSideDistance)) {
@@ -224,19 +241,20 @@ void BOT_ObstacleAvoidance (){
         (distanceRight < stuckDistance) ||
         (distanceFront < stuckDistance)) {
          BOT_Back();
-         delay(1.5*delayTime);
-      
-    } else if ((distanceFront <= minFrontDistance) &&
+         delay(1.5*delayTime);      
+   } 
+    else if ((distanceFront <= minFrontDistance) &&
                (distanceLeft <= minSideDistance) &&
                (distanceRight <= minSideDistance)) {
                 BOT_Back();
-                delay(1.5*delayTime);
-      
-    } else if (distanceLeft > distanceRight ) {
+                delay(1.5*delayTime);    
+   } 
+    else if (distanceLeft > distanceRight ) {
                BOT_Left();
                delay(delayTime);
                
-    } else if (distanceLeft <= distanceRight) {
+    }
+    else if (distanceLeft <= distanceRight) {
               BOT_Right();
               delay(delayTime);
     }
