@@ -104,8 +104,6 @@ void stopAndSetLEDs(int colorValue) {
   setLEDs(colorValue, false);
 }
 
-/////////////////////////////////////////////////
-
 void BOT_ForwardFull () {
   digitalWrite(motorForwardLeft, HIGH);
   digitalWrite(motorBackLeft, LOW);
@@ -242,7 +240,7 @@ void sensorRead () {
 
 void setup() {
   
-  IrReceiver.begin(irPin, ENABLE_LED_FEEDBACK);     // NEW
+  IrReceiver.begin(irPin, ENABLE_LED_FEEDBACK);     
   pinMode(motorEnableLeft, OUTPUT);
   pinMode(motorForwardLeft, OUTPUT);
   pinMode(motorBackLeft, OUTPUT);
@@ -260,12 +258,9 @@ void setup() {
   pinMode(LEDblue, OUTPUT);
   pinMode(NEOIO, OUTPUT);
   
-  IrReceiver.enableIRIn();                // unedited ////////////////////////////////////
+  IrReceiver.enableIRIn();              
   Serial.begin(9600);
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
 
 void loop() {
   if (runFlag && (millis() - activationTime) > timeout_ms) {
