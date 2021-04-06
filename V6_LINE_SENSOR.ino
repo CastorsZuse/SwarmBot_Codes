@@ -240,21 +240,25 @@ void BOT_ObstacleAvoidance (){
     if ((distanceLeft < stuckDistance) ||
         (distanceRight < stuckDistance) ||
         (distanceFront < stuckDistance)) {
+         Serial.println("U/S ALL SENSORS, OBSTACLE DANGEROUSLY CLOSE! BACK UP!");
          BOT_Back();
          delay(1.5*delayTime);      
    } 
     else if ((distanceFront <= minFrontDistance) &&
                (distanceLeft <= minSideDistance) &&
                (distanceRight <= minSideDistance)) {
+                Serial.println("U/S ALL SENSORS OBSTACLE TOO CLOSE. BACK UP");
                 BOT_Back();
                 delay(1.5*delayTime);    
    } 
     else if (distanceLeft > distanceRight ) {
+               Serial.println("U/S OBSTACLE RIGHT, TURNING LEFT");
                BOT_Left();
                delay(delayTime);
                
     }
     else if (distanceLeft <= distanceRight) {
+              Serial.println("U/S OBSTACLE LEFT, TURN RIGHT");
               BOT_Right();
               delay(delayTime);
     }
