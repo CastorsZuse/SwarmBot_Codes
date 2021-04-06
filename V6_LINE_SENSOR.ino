@@ -16,6 +16,8 @@
 //        changing, however the L/R motor does not 
 //        stop. 
 //        its as if another function is pushing thru...
+//        
+//        function triggers on white not black.
 //
 //Pin numbers definition
 const int motorEnableLeft = 9;
@@ -34,9 +36,9 @@ const int irPin = A0;
 
 ///////////////////////////////////////////////////////////////////////////////////
 //Line Sensor Connection
-  const int LEFT_LINE_SENSOR_PIN =A4;
-  const int RIGHT_LINE_SENSOR_PIN =A5;
-  const int THRESHOLD         = 900; 
+  const int LEFT_LINE_SENSOR_PIN = A4;
+  const int RIGHT_LINE_SENSOR_PIN = A5;
+  const int THRESHOLD = 900; 
   
   int LEFT_LINE_SENSOR_STATE;
   int RIGHT_LINE_SENSOR_STATE;
@@ -79,7 +81,7 @@ boolean runFlag = false;
 
 // TIMER
 unsigned long activationTime = 0;
-unsigned long timeout_ms = 10000;
+unsigned long timeout_ms = 10000;   // 1000 = 1 second
 
 //Control IR numbers
 const long iRIN_ACTIVATION = 16761405;
@@ -108,7 +110,7 @@ void stop() {
 
 // colorValue should be a bitwise combination of Color values, such as
 // ( RED | BLUE ) for red and blue
-void setLEDs(int colorValue) {                  // , bool neoValue
+void setLEDs(int colorValue) {  
   digitalWrite(LEDblue, BLUE & colorValue);
   digitalWrite(LEDgreen, GREEN & colorValue);
   digitalWrite(LEDred, RED & colorValue);
@@ -190,9 +192,10 @@ void BOT_NOPE_RIGHT () {
 }
 
 void BOT_ObstacleAvoidance (){
-  //////////////////////////////////////////////////////////////////////////////////
-  LEFT_LINE_SENSOR_STATE = analogRead(LEFT_LINE_SENSOR_PIN);
-  RIGHT_LINE_SENSOR_STATE = analogRead(RIGHT_LINE_SENSOR_PIN);
+             BOT_ForwardFull();
+             sensorRead ();
+          LEFT_LINE_SENSOR_STATE = analogRead(LEFT_LINE_SENSOR_PIN);
+          RIGHT_LINE_SENSOR_STATE = analogRead(RIGHT_LINE_SENSOR_PIN);
 
       if(RIGHT_LINE_SENSOR_STATE > THRESHOLD && 
           LEFT_LINE_SENSOR_STATE < THRESHOLD){
@@ -207,14 +210,12 @@ void BOT_ObstacleAvoidance (){
             delay(delayTime);
    }
       if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && 
-         LEFT_LINE_SENSOR_STATE < THRESHOLD){ 
+         LEFT_LINE_SENSOR_STATE < THRESHOLD) { 
         Serial.println("NOOOPE!!!");
-           BOT_NOPE_BACK();
+          BOT_NOPE_BACK();
             delay(800);
   }
-///////////////////////////////////////////////////////////////////////////////////
-  BOT_ForwardFull();
-  sensorRead ();
+
 
   if ((distanceFront <= minFrontDistance) ||
       (distanceLeft <= minSideDistance) ||
@@ -222,19 +223,22 @@ void BOT_ObstacleAvoidance (){
     if ((distanceLeft < stuckDistance) ||
         (distanceRight < stuckDistance) ||
         (distanceFront < stuckDistance)) {
-      BOT_Back();
-      delay(1.5*delayTime);
+         BOT_Back();
+         delay(1.5*delayTime);
+      
     } else if ((distanceFront <= minFrontDistance) &&
                (distanceLeft <= minSideDistance) &&
                (distanceRight <= minSideDistance)) {
-      BOT_Back();
-      delay(1.5*delayTime);
+                BOT_Back();
+                delay(1.5*delayTime);
+      
     } else if (distanceLeft > distanceRight ) {
-      BOT_Left();
-      delay(delayTime);
+               BOT_Left();
+               delay(delayTime);
+               
     } else if (distanceLeft <= distanceRight) {
-      BOT_Right();
-      delay(delayTime);
+              BOT_Right();
+              delay(delayTime);
     }
   }
 }
@@ -267,12 +271,12 @@ void sensorRead () {
   durationRight = pulseIn(echoPinRight, HIGH);
   distanceRight = durationRight * 0.034 / 2;
 
-  Serial.print("Left Sensor: ");
-  Serial.println(distanceLeft);
-  Serial.print("Right Sensor: ");
-  Serial.println(distanceRight);
-  Serial.print("Front Sensor: ");
-  Serial.println(distanceFront);
+//  Serial.print("Left Sensor: ");
+//  Serial.println(distanceLeft);
+//  Serial.print("Right Sensor: ");
+//  Serial.println(distanceRight);
+//  Serial.print("Front Sensor: ");
+//  Serial.println(distanceFront);
 }
 
 void setup() {
