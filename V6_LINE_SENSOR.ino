@@ -34,17 +34,13 @@ const int echoPinLeft = 4;
 const int trigPinRight = 5;
 const int echoPinRight = 6;
 const int irPin = A0;
-
-///////////////////////////////////////////////////////////////////////////////////
-//Line Sensor Connection
   const int LEFT_LINE_SENSOR_PIN = A4;
   const int RIGHT_LINE_SENSOR_PIN = A5;
+
   const int THRESHOLD = 900; 
-  
+  // boolean ZAPPED_Flag = true
   int LEFT_LINE_SENSOR_STATE;
   int RIGHT_LINE_SENSOR_STATE;
-
-///////////////////////////////////////////////////////////////////////////////////
 
 //RGB LED pins
 const int LEDred = 13;
