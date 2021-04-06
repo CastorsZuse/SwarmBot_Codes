@@ -103,6 +103,7 @@ void stop() {
   analogWrite(motorEnableLeft, 0);
   analogWrite(motorEnableRight, 0);
   runFlag = false;
+//ZAPPED_Flag = true;
 }
 
 // colorValue should be a bitwise combination of Color values, such as
@@ -336,6 +337,7 @@ void loop() {
     switch (current_code) { 
       case iRIN_ACTIVATION:
         Serial.println("BOT ACTIVATION");
+//      ZAPPED_Flag = false;
         runFlag = true;
         activationTime = millis();
         break;
