@@ -371,7 +371,10 @@ void loop() {
         Serial.println("botSTOP_BLUE_GREEN");
         stopAndSetLEDs(BLUE | GREEN);
         break;
-        
+
+ //////////////////////////////////////////////////////
+ ////////////// if ( runFlag ) && ( ZAPPED_Flag ) {      
+
       case iRIN_BUMP_LEFT:
         if ( runFlag ) {
           Serial.println("BOT_BUMP_LEFT");
