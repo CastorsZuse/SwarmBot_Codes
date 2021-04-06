@@ -213,19 +213,19 @@ void BOT_ObstacleAvoidance (){
 
       if(RIGHT_LINE_SENSOR_STATE > THRESHOLD && 
           LEFT_LINE_SENSOR_STATE < THRESHOLD){
-        Serial.println("turning right");
+        Serial.println("iR BOUNDARY DETECTED LEFT, TURN RIGHT");
            BOT_Right();
              delay(delayTime);
   }  
       if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && 
          LEFT_LINE_SENSOR_STATE > THRESHOLD){
-        Serial.println("turning left");
+        Serial.println("iR BOUNDARY DETECTED RIGHT, TURN LEFT");
            BOT_Left();
             delay(delayTime);
    }
       if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && 
          LEFT_LINE_SENSOR_STATE < THRESHOLD) { 
-        Serial.println("NOOOPE!!!");
+        Serial.println("iR BOUNDARY DETECTED FRONT, TURN AROUND");
           BOT_NOPE_BACK();
             delay(800);
   }
