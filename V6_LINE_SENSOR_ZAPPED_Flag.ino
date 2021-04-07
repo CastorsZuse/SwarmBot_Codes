@@ -209,6 +209,7 @@ void BOT_ObstacleAvoidance (){
 //             and left sensor is low
 //             bot will turn right 
 //          function triggetrs on white 
+//          delay 2 x 150
 ////////////////////////////////////////////////////////////////
 
           LEFT_LINE_SENSOR_STATE = analogRead(LEFT_LINE_SENSOR_PIN);
@@ -218,13 +219,13 @@ void BOT_ObstacleAvoidance (){
           LEFT_LINE_SENSOR_STATE < THRESHOLD){
         Serial.println("iR BOUNDARY DETECTED LEFT, TURN RIGHT");
            BOT_Right();
-             delay(delayTime);
+             delay(2*delayTime);
   }  
       if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && 
          LEFT_LINE_SENSOR_STATE > THRESHOLD){
         Serial.println("iR BOUNDARY DETECTED RIGHT, TURN LEFT");
            BOT_Left();
-            delay(delayTime);
+            delay(2*delayTime);
    }
       if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && 
          LEFT_LINE_SENSOR_STATE < THRESHOLD) { 
@@ -325,6 +326,9 @@ void setup() {
   Serial.begin(9600);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 void loop() {
   if (runFlag && (millis() - activationTime) > timeout_ms) {
         stop();
@@ -340,7 +344,7 @@ void loop() {
     switch (current_code) { 
       case iRIN_ACTIVATION:
         Serial.println("BOT ACTIVATION");
-        ZAPPED_Flag = false;
+      ZAPPED_Flag = false;
         runFlag = true;
         activationTime = millis();
         break;
@@ -387,8 +391,16 @@ void loop() {
        }
         break;
 
+////////////////////////////////////////////////////
+// if ( runFlag ) && ( ZAPPED_Flag ) {      
+// if (( runFlag == true) && (ZAPPED_Flag == false){
+//      Set true and false to 1 0
+// if (runFlag > ZAPPED_Flag) {
+// if (runFlag < ZAPPED_Flag) {
+// if (runFlag = ZAPPED_Flag) {
+
       case iRIN_BUMP_LEFT:
-        if (runFlag > ZAPPED_Flag) { 
+        if (runFlag > ZAPPED_Flag) {   // Replace all lines in relation [
           Serial.println("BOT_BUMP_LEFT");
           BOT_Left();
           delay(500);
