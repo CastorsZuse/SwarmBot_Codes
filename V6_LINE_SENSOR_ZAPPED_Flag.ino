@@ -56,7 +56,7 @@ enum Color : int {
 // Veritables for iR barrier detectors
 const int THRESHOLD = 900; 
 int LEFT_LINE_SENSOR_STATE;
-int RIGHT_LINE_SENSOR_STATE
+int RIGHT_LINE_SENSOR_STATE;
 
 //Variables for the Motors
 const int leftMotorSpeed = 255;
