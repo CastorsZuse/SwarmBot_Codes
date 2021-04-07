@@ -24,28 +24,32 @@
 const int motorEnableLeft = 9;
 const int motorForwardLeft = 7;
 const int motorBackLeft = 8;
+
 const int motorEnableRight = 11;
 const int motorForwardRight = 12;
 const int motorBackRight = 10;
+
 const int trigPinFront = A1;
 const int echoPinFront = 2;
 const int trigPinLeft = 3;
 const int echoPinLeft = 4;
 const int trigPinRight = 5;
 const int echoPinRight = 6;
-const int irPin = A0;
-  const int LEFT_LINE_SENSOR_PIN = A4;
-  const int RIGHT_LINE_SENSOR_PIN = A5;
 
-  const int THRESHOLD = 900; 
-  // boolean ZAPPED_Flag = true
-  int LEFT_LINE_SENSOR_STATE;
-  int RIGHT_LINE_SENSOR_STATE;
+const int irPin = A0;
+
+const int LEFT_LINE_SENSOR_PIN = A4;
+const int RIGHT_LINE_SENSOR_PIN = A5;
 
 //RGB LED pins
 const int LEDred = 13;
 const int LEDgreen = A2;
 const int LEDblue = A3;
+
+  const int THRESHOLD = 900; 
+  // boolean ZAPPED_Flag = true
+  int LEFT_LINE_SENSOR_STATE;
+  int RIGHT_LINE_SENSOR_STATE
 
 enum Color : int {
   RED   = 1,
