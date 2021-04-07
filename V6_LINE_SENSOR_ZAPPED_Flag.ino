@@ -21,41 +21,42 @@
 //        function triggers on white not black.
 //
 //Pin numbers definition
+// Left motor pins
 const int motorEnableLeft = 9;
 const int motorForwardLeft = 7;
 const int motorBackLeft = 8;
-
+// Right motor pins
 const int motorEnableRight = 11;
 const int motorForwardRight = 12;
 const int motorBackRight = 10;
-
+// Ultrasonic sensor pins
 const int trigPinFront = A1;
 const int echoPinFront = 2;
 const int trigPinLeft = 3;
 const int echoPinLeft = 4;
 const int trigPinRight = 5;
 const int echoPinRight = 6;
-
+// iR receiver pin
 const int irPin = A0;
-
+// iR input pins
 const int LEFT_LINE_SENSOR_PIN = A4;
 const int RIGHT_LINE_SENSOR_PIN = A5;
-
 //RGB LED pins
 const int LEDred = 13;
 const int LEDgreen = A2;
 const int LEDblue = A3;
 
-  const int THRESHOLD = 900; 
-  // boolean ZAPPED_Flag = true
-  int LEFT_LINE_SENSOR_STATE;
-  int RIGHT_LINE_SENSOR_STATE
-
+// Veritables for color set
 enum Color : int {
   RED   = 1,
   GREEN = 2,
   BLUE  = 4
 };
+
+// Veritables for iR barrier detectors
+const int THRESHOLD = 900; 
+int LEFT_LINE_SENSOR_STATE;
+int RIGHT_LINE_SENSOR_STATE
 
 //Variables for the Motors
 const int leftMotorSpeed = 255;
@@ -73,14 +74,15 @@ const int minFrontDistance = 30;
 const int minSideDistance = 20;
 const int stuckDistance = 10;
 
-//Variables for IR Sensor
+//Variables for IR Receiver
 #include <IRremote.h>
 IRrecv irrecv(irPin);
 decode_results results;
 unsigned long current_code = 0;
 boolean runFlag = false;
+// boolean ZAPPED_Flag = true
 
-// TIMER
+// Veritables for the TIMER
 unsigned long activationTime = 0;
 unsigned long timeout_ms = 90000;   // 1000 = 1 second
 
