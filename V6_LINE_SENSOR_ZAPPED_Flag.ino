@@ -80,11 +80,11 @@ IRrecv irrecv(irPin);
 decode_results results;
 unsigned long current_code = 0;
 boolean runFlag = false;
-// boolean ZAPPED_Flag = true
+boolean ZAPPED_Flag = true;
 
 // Veritables for the TIMER
 unsigned long activationTime = 0;
-unsigned long timeout_ms = 90000;   // 1000 = 1 second
+unsigned long timeout_ms = 10000;   // 1000 = 1 second
 
 //Control IR numbers
 const long iRIN_ACTIVATION = 16761405;
@@ -109,7 +109,7 @@ void stop() {
   analogWrite(motorEnableLeft, 0);
   analogWrite(motorEnableRight, 0);
   runFlag = false;
-//ZAPPED_Flag = true;
+  ZAPPED_Flag = true;
 }
 
 // colorValue should be a bitwise combination of Color values, such as
@@ -325,9 +325,6 @@ void setup() {
   Serial.begin(9600);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-
 void loop() {
   if (runFlag && (millis() - activationTime) > timeout_ms) {
         stop();
@@ -343,51 +340,55 @@ void loop() {
     switch (current_code) { 
       case iRIN_ACTIVATION:
         Serial.println("BOT ACTIVATION");
-//      ZAPPED_Flag = false;
+        ZAPPED_Flag = false;
         runFlag = true;
         activationTime = millis();
         break;
 
       case iRIN_botSTOP_R:
+       if (runFlag > ZAPPED_Flag) {
         Serial.println("botSTOP_RED");
         stopAndSetLEDs(RED);
+       }
         break;
         
       case iRIN_botSTOP_G:
+       if (runFlag > ZAPPED_Flag) {
         Serial.println("botSTOP_GREEN");
         stopAndSetLEDs(GREEN);
+       }
         break;
         
       case iRIN_botSTOP_B:
+       if (runFlag > ZAPPED_Flag) {
         Serial.println("botSTOP_BLUE");
         stopAndSetLEDs(BLUE);
+       }
         break;
         
       case iRIN_botSTOP_RB:
+       if (runFlag > ZAPPED_Flag) {
         Serial.println("botSTOP_RED_BLUE");
         stopAndSetLEDs(RED | BLUE);
+       }
         break;
         
       case iRIN_botSTOP_RG:
+       if (runFlag > ZAPPED_Flag) {
         Serial.println("botSTOP_RED_GREEN");
         stopAndSetLEDs(RED | GREEN);
+       }
         break;
         
       case iRIN_botSTOP_BG:
+       if (runFlag > ZAPPED_Flag) {
         Serial.println("botSTOP_BLUE_GREEN");
         stopAndSetLEDs(BLUE | GREEN);
+       }
         break;
 
-////////////////////////////////////////////////////
-// if ( runFlag ) && ( ZAPPED_Flag ) {      
-// if (( runFlag == true) && (ZAPPED_Flag == false){
-//      Set true and false to 1 0
-// if (runFlag > ZAPPED_Flag) {
-// if (runFlag < ZAPPED_Flag) {
-// if (runFlag = ZAPPED_Flag) {
-
       case iRIN_BUMP_LEFT:
-        if ( runFlag ) {   // Replace all lines in relation 
+        if (runFlag > ZAPPED_Flag) { 
           Serial.println("BOT_BUMP_LEFT");
           BOT_Left();
           delay(500);
@@ -395,7 +396,7 @@ void loop() {
         break;
         
       case iRIN_BUMP_RIGHT:
-        if ( runFlag ) {
+        if (runFlag > ZAPPED_Flag) {
           Serial.println("BOT_BUMP_RIGHT");
           BOT_Right();
           delay(500);
@@ -403,7 +404,7 @@ void loop() {
         break;
 
       case iRIN_STALL:
-        if ( runFlag ) {
+        if (runFlag > ZAPPED_Flag) {
           Serial.println("BOT_STALL");
           BOT_Back();
           delay(500);
@@ -411,7 +412,7 @@ void loop() {
         break;
 
       case iRIN_NOPE_LEFT:
-        if ( runFlag ) {
+        if (runFlag > ZAPPED_Flag) {
           Serial.println("NOPE_LEFT");
           BOT_NOPE_LEFT();
           delay (350);
@@ -419,7 +420,7 @@ void loop() {
         break;
 
       case iRIN_NOPE_BACK:
-        if ( runFlag ) {
+        if (runFlag > ZAPPED_Flag) {
           Serial.println("NOOOOPE");
           BOT_NOPE_BACK();
           delay (800);
@@ -427,7 +428,7 @@ void loop() {
         break;
 
       case iRIN_NOPE_RIGHT:
-        if ( runFlag ) {
+        if (runFlag > ZAPPED_Flag) {
           Serial.println("NOPE_RIGHT");
           BOT_NOPE_RIGHT();
           delay (350);
