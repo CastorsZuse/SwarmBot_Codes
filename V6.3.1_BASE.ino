@@ -4,7 +4,7 @@
 // UPDATED TO SWICH/CASE FORMAT 
 // TIMER FUNCTION
 // UPDATED TO 3.1 irRemote LIB
-// ZAPPED_Flag UPDATE
+// zappedFlag UPDATE
 // BOUNDARY DETECTION UPGRADE 
 // UPDATED DEBUG IN SERIAL MONITOR
 //////////////////////////////////////////////////////
@@ -32,7 +32,7 @@
 //
 //    4.7.21 STATUS:
 //        merged with lib update
-//                    zapped_flag
+//                    zappedFlag
 //                    BOUNDARY DETECTION
 //
 //    4.5.21 STATUS: 
@@ -62,8 +62,8 @@ const int echoPinRight = 6;
 // iR receiver pin
 const int irPin = A0;
 // iR input pins
-const int LEFT_LINE_SENSOR_PIN = A4;
-const int RIGHT_LINE_SENSOR_PIN = A5;
+const int boundaryDetectionLEFT_pin = A4;
+const int boundaryDetectionRIGHT_pin = A5;
 //RGB LED pins
 const int LEDred = 13;
 const int LEDgreen = A2;
@@ -78,8 +78,8 @@ enum Color : int {
 
 // Veritables for iR barrier detectors
 const int THRESHOLD = 900; 
-int LEFT_LINE_SENSOR_STATE;
-int RIGHT_LINE_SENSOR_STATE;
+int boundaryDetectionLEFT_STATE;
+int boundaryDetectionRIGHT_STATE;
 
 //Variables for the Motors
 const int leftMotorSpeed = 255;
@@ -102,7 +102,7 @@ const int stuckDistance = 10;
 #include <IRremote.h>
 unsigned long current_code = 0;
 boolean runFlag = false;
-boolean ZAPPED_Flag = true;
+boolean zappedFlag = true;
 
 // Veritables for the TIMER
 unsigned long activationTime = 0;
@@ -131,7 +131,7 @@ void stop() {
   analogWrite(motorEnableLeft, 0);
   analogWrite(motorEnableRight, 0);
   runFlag = false;
-  ZAPPED_Flag = true;
+  zappedFlag = true;
 }
 
 // colorValue should be a bitwise combination of Color values, such as
@@ -225,8 +225,8 @@ void BOT_ObstacleAvoidance (){
 /////////////// LINE FOLLOWING SENSOR AI TREE /////////////////////
 ///////////////////////////////////////////////////////////////////
 
-//        (RIGHT_LINE_SENSOR_STATE > THRESHOLD && 
-//          LEFT_LINE_SENSOR_STATE < THRESHOLD){
+//        (boundaryDetectionRIGHT_STATE > THRESHOLD && 
+//          boundaryDetectionLEFT_STATE < THRESHOLD){
 //          if the right sensor is high
 //             and left sensor is low
 //             bot will turn right 
@@ -234,23 +234,23 @@ void BOT_ObstacleAvoidance (){
 //          delay 2 x 150
 ////////////////////////////////////////////////////////////////
 
-          LEFT_LINE_SENSOR_STATE = analogRead(LEFT_LINE_SENSOR_PIN);
-          RIGHT_LINE_SENSOR_STATE = analogRead(RIGHT_LINE_SENSOR_PIN);
+          boundaryDetectionLEFT_STATE = analogRead(boundaryDetectionLEFT_pin);
+          boundaryDetectionRIGHT_STATE = analogRead(boundaryDetectionRIGHT_pin);
 
-      if(RIGHT_LINE_SENSOR_STATE > THRESHOLD && 
-          LEFT_LINE_SENSOR_STATE < THRESHOLD){
+      if(boundaryDetectionRIGHT_STATE > THRESHOLD && 
+          boundaryDetectionLEFT_STATE < THRESHOLD){
         Serial.println("iR BOUNDARY DETECTED LEFT, TURN RIGHT");
            BOT_Right();
              delay(2*delayTime);
   }  
-      if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && 
-         LEFT_LINE_SENSOR_STATE > THRESHOLD){
+      if(boundaryDetectionRIGHT_STATE < THRESHOLD && 
+         boundaryDetectionLEFT_STATE > THRESHOLD){
         Serial.println("iR BOUNDARY DETECTED RIGHT, TURN LEFT");
            BOT_Left();
             delay(2*delayTime);
    }
-      if(RIGHT_LINE_SENSOR_STATE < THRESHOLD && 
-         LEFT_LINE_SENSOR_STATE < THRESHOLD) { 
+      if(boundaryDetectionRIGHT_STATE < THRESHOLD && 
+         boundaryDetectionLEFT_STATE < THRESHOLD) { 
         Serial.println("iR BOUNDARY DETECTED FRONT, TURN AROUND");
           BOT_NOPE_BACK();
             delay(800);
@@ -366,63 +366,63 @@ void loop() {
     switch (current_code) { 
       case iRIN_ACTIVATION:
         Serial.println("BOT ACTIVATION");
-      ZAPPED_Flag = false;
+      zappedFlag = false;
         runFlag = true;
         activationTime = millis();
         break;
 
       case iRIN_botSTOP_R:
-       if (runFlag > ZAPPED_Flag) {
+       if (runFlag > zappedFlag) {
         Serial.println("botSTOP_RED");
         stopAndSetLEDs(RED);
        }
         break;
         
       case iRIN_botSTOP_G:
-       if (runFlag > ZAPPED_Flag) {
+       if (runFlag > zappedFlag) {
         Serial.println("botSTOP_GREEN");
         stopAndSetLEDs(GREEN);
        }
         break;
         
       case iRIN_botSTOP_B:
-       if (runFlag > ZAPPED_Flag) {
+       if (runFlag > zappedFlag) {
         Serial.println("botSTOP_BLUE");
         stopAndSetLEDs(BLUE);
        }
         break;
         
       case iRIN_botSTOP_RB:
-       if (runFlag > ZAPPED_Flag) {
+       if (runFlag > zappedFlag) {
         Serial.println("botSTOP_RED_BLUE");
         stopAndSetLEDs(RED | BLUE);
        }
         break;
         
       case iRIN_botSTOP_RG:
-       if (runFlag > ZAPPED_Flag) {
+       if (runFlag > zappedFlag) {
         Serial.println("botSTOP_RED_GREEN");
         stopAndSetLEDs(RED | GREEN);
        }
         break;
         
       case iRIN_botSTOP_BG:
-       if (runFlag > ZAPPED_Flag) {
+       if (runFlag > zappedFlag) {
         Serial.println("botSTOP_BLUE_GREEN");
         stopAndSetLEDs(BLUE | GREEN);
        }
         break;
 
 ////////////////////////////////////////////////////
-// if ( runFlag ) && ( ZAPPED_Flag ) {      
-// if (( runFlag == true) && (ZAPPED_Flag == false){
+// if ( runFlag ) && ( zappedFlag ) {      
+// if (( runFlag == true) && (zappedFlag == false){
 //      Set true and false to 1 0
-// if (runFlag > ZAPPED_Flag) {
-// if (runFlag < ZAPPED_Flag) {
-// if (runFlag = ZAPPED_Flag) {
+// if (runFlag > zappedFlag) {
+// if (runFlag < zappedFlag) {
+// if (runFlag = zappedFlag) {
 
       case iRIN_BUMP_LEFT:
-        if (runFlag > ZAPPED_Flag) {   // Replace all lines in relation [
+        if (runFlag > zappedFlag) {   // Replace all lines in relation [
           Serial.println("BOT_BUMP_LEFT");
           BOT_Left();
           delay(500);
@@ -430,7 +430,7 @@ void loop() {
         break;
         
       case iRIN_BUMP_RIGHT:
-        if (runFlag > ZAPPED_Flag) {
+        if (runFlag > zappedFlag) {
           Serial.println("BOT_BUMP_RIGHT");
           BOT_Right();
           delay(500);
@@ -438,7 +438,7 @@ void loop() {
         break;
 
       case iRIN_STALL:
-        if (runFlag > ZAPPED_Flag) {
+        if (runFlag > zappedFlag) {
           Serial.println("BOT_STALL");
           BOT_Back();
           delay(500);
@@ -446,7 +446,7 @@ void loop() {
         break;
 
       case iRIN_NOPE_LEFT:
-        if (runFlag > ZAPPED_Flag) {
+        if (runFlag > zappedFlag) {
           Serial.println("NOPE_LEFT");
           BOT_NOPE_LEFT();
           delay (350);
@@ -454,7 +454,7 @@ void loop() {
         break;
 
       case iRIN_NOPE_BACK:
-        if (runFlag > ZAPPED_Flag) {
+        if (runFlag > zappedFlag) {
           Serial.println("NOOOOPE");
           BOT_NOPE_BACK();
           delay (800);
@@ -462,7 +462,7 @@ void loop() {
         break;
 
       case iRIN_NOPE_RIGHT:
-        if (runFlag > ZAPPED_Flag) {
+        if (runFlag > zappedFlag) {
           Serial.println("NOPE_RIGHT");
           BOT_NOPE_RIGHT();
           delay (350);
