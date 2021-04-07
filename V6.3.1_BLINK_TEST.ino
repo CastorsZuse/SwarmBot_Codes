@@ -1,10 +1,15 @@
 // SWARM BOTS: 
-// NEOPIXEL REMOTE ACTIVATION
 // MULTI PLAYER RECEIVER CODE
-// BUMP CODE 
-// UPDATED TO SWICH/CASE FORMAT
+// BUMP/NOPE CODE 
+// UPDATED TO SWICH/CASE FORMAT 
+// TIMER FUNCTION
+// UPDATED TO 3.1 irRemote LIB
+// zappedFlag UPDATE
+// BOUNDARY DETECTION UPGRADE 
+// UPDATED DEBUG IN SERIAL MONITOR
 //////////////////////////////////////////////////////
-////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+//
 // CONCEPT AND DESIGN BY: Nolan Cash
 // WRITEN BY: Nolan Cash
 // CoWRITEN BY: Andy Tracy
@@ -15,46 +20,66 @@
 //      Steve Owens 
 // See SwarmBots.online for more info // 
 //
+////////////////////////////////////////// NOTES //////////
+///////////////////////////////////////////////////////////
 //
-//////////////////////// NOTES ///////////////////////////////
-//
-//    working test code and history of issue 3  
-//         "needs blink without delay to happen on ledRED 
-//         after timeout_ms, till iRIN_ACTIVATION is receved"
-//    AREAS HASH FLAGGED FOR SCROLLING ///
-//     
-//            
-//     STUFF THAT DIDNT WORK
-//          
-//
-//
+// This code is the curent base code with working list above
+//  current issues:
 
+//      1: needs blink without delay to happen on ledRED 
+//         after timeout_ms, till iRIN_ACTIVATION is receved 
+//            FIX: unknown 
+//
+//    4.7.21 STATUS:
+//        merged with lib update
+//                    zappedFlag
+//                    BOUNDARY DETECTION
+//
+//    4.5.21 STATUS: 
+//        line following ir sensors are working with
+//        a 10-15mm range.       
+//        function triggers on white not black.
+//
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+//
 //Pin numbers definition
+// Left motor pins
 const int motorEnableLeft = 9;
 const int motorForwardLeft = 7;
 const int motorBackLeft = 8;
+// Right motor pins
 const int motorEnableRight = 11;
 const int motorForwardRight = 12;
 const int motorBackRight = 10;
+// Ultrasonic sensor pins
 const int trigPinFront = A1;
 const int echoPinFront = 2;
 const int trigPinLeft = 3;
 const int echoPinLeft = 4;
 const int trigPinRight = 5;
 const int echoPinRight = 6;
+// iR receiver pin
 const int irPin = A0;
-const int NEOIO = A4;
-
+// iR input pins
+const int boundaryDetectionLEFT_pin = A4;
+const int boundaryDetectionRIGHT_pin = A5;
 //RGB LED pins
 const int LEDred = 13;
 const int LEDgreen = A2;
 const int LEDblue = A3;
 
+// Veritables for color set
 enum Color : int {
   RED   = 1,
   GREEN = 2,
   BLUE  = 4
 };
+
+// Veritables for iR barrier detectors
+const int THRESHOLD = 900; 
+int boundaryDetectionLEFT_STATE;
+int boundaryDetectionRIGHT_STATE;
 
 //Variables for the Motors
 const int leftMotorSpeed = 255;
@@ -72,37 +97,37 @@ const int minFrontDistance = 30;
 const int minSideDistance = 20;
 const int stuckDistance = 10;
 
-//Variables for IR Sensor
+//Variables for IR Receiver
+#define DECODE_NEC
 #include <IRremote.h>
-IRrecv irrecv(irPin);
-decode_results results;
 unsigned long current_code = 0;
 boolean runFlag = false;
+boolean zappedFlag = true;
 
-// TIMER
+// Veritables for the TIMER
 unsigned long activationTime = 0;
-unsigned long timeout_ms = 10000;
+unsigned long timeout_ms = 10000;   // 1000 = 1 second
 
-// BLINK Variables////////////////////////////////////////////////////////////////////////////////////
+
+// BLINK Variables ////////////////////////////////////////////////////////////////////////
 int ledState = LOW; 
 unsigned long previousMillis = 0;
 const long interval = 300; 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Control IR numbers
-const long iRIN_ACTIVATION = 16761405;
-const long iRIN_botSTOP_R =  16724175;
-const long iRIN_botSTOP_G =  16718055;
-const long iRIN_botSTOP_B =  16743045;
-const long iRIN_botSTOP_RB = 16716015;
-const long iRIN_botSTOP_RG = 16726215;
-const long iRIN_botSTOP_BG = 16734885;
-const long iRIN_BUMP_LEFT =  16753245;
-const long iRIN_STALL =      16736925;
-const long iRIN_BUMP_RIGHT = 16769565;
-const long iRIN_NOPE_LEFT =  16769055;
-const long iRIN_NOPE_BACK  = 16754775;
-const long iRIN_NOPE_RIGHT = 16748655;
+const long iRIN_ACTIVATION = 3158572800;
+const long iRIN_botSTOP_R =  4077715200;
+const long iRIN_botSTOP_G =  3877175040;
+const long iRIN_botSTOP_B =  2707357440;
+const long iRIN_botSTOP_RB = 4144561920;
+const long iRIN_botSTOP_RG = 3810328320;
+const long iRIN_botSTOP_BG = 2774204160;
+const long iRIN_BUMP_LEFT =  3125149440;
+const long iRIN_STALL =      3108437760;
+const long iRIN_BUMP_RIGHT = 3091726080;
+const long iRIN_NOPE_LEFT =  4161273600;
+const long iRIN_NOPE_BACK  = 3927310080;
+const long iRIN_NOPE_RIGHT = 4127850240;
 
 void stop() {
   digitalWrite(motorForwardLeft, LOW);
@@ -112,8 +137,8 @@ void stop() {
   analogWrite(motorEnableLeft, 0);
   analogWrite(motorEnableRight, 0);
   runFlag = false;
+  zappedFlag = true;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////
 void TIMEstop() {
   digitalWrite(motorForwardLeft, LOW);
   digitalWrite(motorBackLeft, LOW);
@@ -122,9 +147,9 @@ void TIMEstop() {
   analogWrite(motorEnableLeft, 0);
   analogWrite(motorEnableRight, 0);
   runFlag = false;
-   unsigned long currentMillis = millis();
-
-  if (currentMillis - previousMillis >= interval) {  
+   zappedFlag = true;
+   unsigned long currentMillis = millis();    
+  if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
     if (ledState == LOW) {
       ledState = HIGH;
@@ -133,23 +158,20 @@ void TIMEstop() {
     }
     digitalWrite(LEDred, ledState);
   }
-} /////////////////////////////////////////////////////////////////////////////////////////////////////
+} 
 
 // colorValue should be a bitwise combination of Color values, such as
 // ( RED | BLUE ) for red and blue
-void setLEDs(int colorValue, bool neoValue) {
+void setLEDs(int colorValue) {  
   digitalWrite(LEDblue, BLUE & colorValue);
   digitalWrite(LEDgreen, GREEN & colorValue);
   digitalWrite(LEDred, RED & colorValue);
-  digitalWrite(NEOIO, neoValue);
 }
 
 void stopAndSetLEDs(int colorValue) {
   stop();
-  setLEDs(colorValue, false);
+  setLEDs(colorValue);
 }
-
-/////////////////////////////////////////////////
 
 void BOT_ForwardFull () {
   digitalWrite(motorForwardLeft, HIGH);
@@ -158,7 +180,7 @@ void BOT_ForwardFull () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | GREEN | BLUE, true);
+  setLEDs(RED | GREEN | BLUE);
 }
 
 void BOT_Left () {
@@ -168,7 +190,7 @@ void BOT_Left () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, 0);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(GREEN, true);
+  setLEDs(GREEN);
 }
 
 void BOT_Right () {
@@ -178,7 +200,7 @@ void BOT_Right () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, 0);
-  setLEDs(GREEN, true);
+  setLEDs(GREEN);
 }
 
 void BOT_Back () {
@@ -188,7 +210,7 @@ void BOT_Back () {
   digitalWrite(motorBackRight, HIGH);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(BLUE, true);
+  setLEDs(BLUE);
 }
 
 void BOT_NOPE_LEFT () {
@@ -198,7 +220,7 @@ void BOT_NOPE_LEFT () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | GREEN, true);
+  setLEDs(RED | GREEN);
 }
 
 void BOT_NOPE_BACK () {
@@ -208,7 +230,7 @@ void BOT_NOPE_BACK () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | BLUE, true);
+  setLEDs(RED | BLUE);
 }
 
 void BOT_NOPE_RIGHT () {
@@ -218,33 +240,79 @@ void BOT_NOPE_RIGHT () {
   digitalWrite(motorBackRight, HIGH);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | GREEN, true);
+  setLEDs(RED | GREEN);
 }
 
 void BOT_ObstacleAvoidance (){
-  
-  BOT_ForwardFull();
-  sensorRead ();
+             BOT_ForwardFull();
+             sensorRead ();
 
+////////////////////////////////////////////////////////////////////
+/////////////// LINE FOLLOWING SENSOR AI TREE /////////////////////
+///////////////////////////////////////////////////////////////////
+
+//        (boundaryDetectionRIGHT_STATE > THRESHOLD && 
+//          boundaryDetectionLEFT_STATE < THRESHOLD){
+//          if the right sensor is high
+//             and left sensor is low
+//             bot will turn right 
+//          function triggetrs on white 
+//          delay 2 x 150
+////////////////////////////////////////////////////////////////
+
+          boundaryDetectionLEFT_STATE = analogRead(boundaryDetectionLEFT_pin);
+          boundaryDetectionRIGHT_STATE = analogRead(boundaryDetectionRIGHT_pin);
+
+      if(boundaryDetectionRIGHT_STATE > THRESHOLD && 
+          boundaryDetectionLEFT_STATE < THRESHOLD){
+        Serial.println("iR BOUNDARY DETECTED LEFT, TURN RIGHT");
+           BOT_Right();
+             delay(2*delayTime);
+  }  
+      if(boundaryDetectionRIGHT_STATE < THRESHOLD && 
+         boundaryDetectionLEFT_STATE > THRESHOLD){
+        Serial.println("iR BOUNDARY DETECTED RIGHT, TURN LEFT");
+           BOT_Left();
+            delay(2*delayTime);
+   }
+      if(boundaryDetectionRIGHT_STATE < THRESHOLD && 
+         boundaryDetectionLEFT_STATE < THRESHOLD) { 
+        Serial.println("iR BOUNDARY DETECTED FRONT, TURN AROUND");
+          BOT_NOPE_BACK();
+            delay(800);
+  }
+
+////////////////////////////////////////////////////////////////////
+/////////////// LINE FOLLOWING SENSOR AI TREE /////////////////////
+///////////////////////////////////////////////////////////////////
+  
   if ((distanceFront <= minFrontDistance) ||
       (distanceLeft <= minSideDistance) ||
       (distanceRight <= minSideDistance)) {
     if ((distanceLeft < stuckDistance) ||
         (distanceRight < stuckDistance) ||
         (distanceFront < stuckDistance)) {
-      BOT_Back();
-      delay(1.5*delayTime);
-    } else if ((distanceFront <= minFrontDistance) &&
+         Serial.println("U/S ALL SENSORS, OBSTACLE DANGEROUSLY CLOSE! BACK UP!");
+         BOT_Back();
+         delay(1.5*delayTime);      
+   } 
+    else if ((distanceFront <= minFrontDistance) &&
                (distanceLeft <= minSideDistance) &&
                (distanceRight <= minSideDistance)) {
-      BOT_Back();
-      delay(1.5*delayTime);
-    } else if (distanceLeft > distanceRight ) {
-      BOT_Left();
-      delay(delayTime);
-    } else if (distanceLeft <= distanceRight) {
-      BOT_Right();
-      delay(delayTime);
+                Serial.println("U/S ALL SENSORS OBSTACLE TOO CLOSE. BACK UP");
+                BOT_Back();
+                delay(1.5*delayTime);    
+   } 
+    else if (distanceLeft > distanceRight ) {
+               Serial.println("U/S OBSTACLE RIGHT, TURNING LEFT");
+               BOT_Left();
+               delay(delayTime);
+               
+    }
+    else if (distanceLeft <= distanceRight) {
+              Serial.println("U/S OBSTACLE LEFT, TURN RIGHT");
+              BOT_Right();
+              delay(delayTime);
     }
   }
 }
@@ -277,15 +345,16 @@ void sensorRead () {
   durationRight = pulseIn(echoPinRight, HIGH);
   distanceRight = durationRight * 0.034 / 2;
 
-  Serial.print("Left Sensor: ");
-  Serial.println(distanceLeft);
-  Serial.print("Right Sensor: ");
-  Serial.println(distanceRight);
-  Serial.print("Front Sensor: ");
-  Serial.println(distanceFront);
+//  Serial.print("Left Sensor: ");
+//  Serial.println(distanceLeft);
+//  Serial.print("Right Sensor: ");
+//  Serial.println(distanceRight);
+//  Serial.print("Front Sensor: ");
+//  Serial.println(distanceFront);
 }
 
 void setup() {
+  IrReceiver.begin(irPin, ENABLE_LED_FEEDBACK); ////////// NEW <
   pinMode(motorEnableLeft, OUTPUT);
   pinMode(motorForwardLeft, OUTPUT);
   pinMode(motorBackLeft, OUTPUT);
@@ -301,65 +370,85 @@ void setup() {
   pinMode(LEDred, OUTPUT);
   pinMode(LEDgreen, OUTPUT);
   pinMode(LEDblue, OUTPUT);
-  pinMode(NEOIO, OUTPUT);
   
-  irrecv.enableIRIn();
+  IrReceiver.enableIRIn(); /////////////////////////// NEW <   
   Serial.begin(9600);
 }
 
-////////////////////////////////////////////////////////////////////////// VOID LOOP ///////////
-////////////////////////////////////////////////////////////////////////////////////////////////
-
 void loop() {
+    /////////////////////////////////////////////////// NEW{
   if (runFlag && (millis() - activationTime) > timeout_ms) {
-        TIMEstop();
-      }
+        stopAndSetLEDs(RED | GREEN | BLUE);
+  }
 
-  if (irrecv.decode(&results)) {
-    current_code = results.value;
+  if (IrReceiver.decode()){
+    current_code = IrReceiver.decodedIRData.decodedRawData;
     Serial.print("New code received: ");
     Serial.println(current_code);
-    irrecv.resume();
+    IrReceiver.resume();        
+///////////////////////////////////////////////////// NEW}
+
 
     switch (current_code) { 
       case iRIN_ACTIVATION:
         Serial.println("BOT ACTIVATION");
+      zappedFlag = false;
         runFlag = true;
         activationTime = millis();
         break;
 
       case iRIN_botSTOP_R:
+       if (runFlag > zappedFlag) {
         Serial.println("botSTOP_RED");
         stopAndSetLEDs(RED);
+       }
         break;
         
       case iRIN_botSTOP_G:
+       if (runFlag > zappedFlag) {
         Serial.println("botSTOP_GREEN");
         stopAndSetLEDs(GREEN);
+       }
         break;
         
       case iRIN_botSTOP_B:
+       if (runFlag > zappedFlag) {
         Serial.println("botSTOP_BLUE");
         stopAndSetLEDs(BLUE);
+       }
         break;
         
       case iRIN_botSTOP_RB:
+       if (runFlag > zappedFlag) {
         Serial.println("botSTOP_RED_BLUE");
         stopAndSetLEDs(RED | BLUE);
+       }
         break;
         
       case iRIN_botSTOP_RG:
+       if (runFlag > zappedFlag) {
         Serial.println("botSTOP_RED_GREEN");
         stopAndSetLEDs(RED | GREEN);
+       }
         break;
         
       case iRIN_botSTOP_BG:
+       if (runFlag > zappedFlag) {
         Serial.println("botSTOP_BLUE_GREEN");
         stopAndSetLEDs(BLUE | GREEN);
+       }
         break;
-        
+
+////////////////////////////////////////////////////
+// if ( runFlag ) && ( zappedFlag ) {      
+// if (( runFlag == true) && (zappedFlag == false){
+//      Set true and false to 1 0
+// if (runFlag > zappedFlag) {
+// if (runFlag < zappedFlag) {
+// if (runFlag = zappedFlag) {
+
       case iRIN_BUMP_LEFT:
-        if ( runFlag ) {
+        if (runFlag > zappedFlag) {   // Replace all lines in relation [
           Serial.println("BOT_BUMP_LEFT");
           BOT_Left();
           delay(500);
@@ -367,7 +456,7 @@ void loop() {
         break;
         
       case iRIN_BUMP_RIGHT:
-        if ( runFlag ) {
+        if (runFlag > zappedFlag) {
           Serial.println("BOT_BUMP_RIGHT");
           BOT_Right();
           delay(500);
@@ -375,7 +464,7 @@ void loop() {
         break;
 
       case iRIN_STALL:
-        if ( runFlag ) {
+        if (runFlag > zappedFlag) {
           Serial.println("BOT_STALL");
           BOT_Back();
           delay(500);
@@ -383,7 +472,7 @@ void loop() {
         break;
 
       case iRIN_NOPE_LEFT:
-        if ( runFlag ) {
+        if (runFlag > zappedFlag) {
           Serial.println("NOPE_LEFT");
           BOT_NOPE_LEFT();
           delay (350);
@@ -391,7 +480,7 @@ void loop() {
         break;
 
       case iRIN_NOPE_BACK:
-        if ( runFlag ) {
+        if (runFlag > zappedFlag) {
           Serial.println("NOOOOPE");
           BOT_NOPE_BACK();
           delay (800);
@@ -399,7 +488,7 @@ void loop() {
         break;
 
       case iRIN_NOPE_RIGHT:
-        if ( runFlag ) {
+        if (runFlag > zappedFlag) {
           Serial.println("NOPE_RIGHT");
           BOT_NOPE_RIGHT();
           delay (350);
