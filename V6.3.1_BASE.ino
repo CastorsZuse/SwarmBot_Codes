@@ -4,6 +4,7 @@
 // UPDATED TO SWICH/CASE FORMAT 
 // TIMER FUNCTION
 // UPDATED TO 3.1 irRemote LIB
+// Control IR numbers 3.0 UPDATE 
 // zappedFlag UPDATE
 // BOUNDARY DETECTION UPGRADE 
 // UPDATED DEBUG IN SERIAL MONITOR
@@ -39,6 +40,9 @@
 //        line following ir sensors are working with
 //        a 10-15mm range.       
 //        function triggers on white not black.
+//      MEANING THAT THE BOUNDARIES NEED TO BE RAISED AND WHITE
+//      LIKE DOUBLE STACKED FOAM BOARD. EVERYTHING ELSE WILL 
+//      BE TOO FAR OUT OF RANGE TO DETECT OR INTERFERE 
 //
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
@@ -108,20 +112,20 @@ boolean zappedFlag = true;
 unsigned long activationTime = 0;
 unsigned long timeout_ms = 10000;   // 1000 = 1 second
 
-//Control IR numbers
-const long iRIN_ACTIVATION = 3158572800;
-const long iRIN_botSTOP_R =  4077715200;
-const long iRIN_botSTOP_G =  3877175040;
-const long iRIN_botSTOP_B =  2707357440;
-const long iRIN_botSTOP_RB = 4144561920;
-const long iRIN_botSTOP_RG = 3810328320;
-const long iRIN_botSTOP_BG = 2774204160;
-const long iRIN_BUMP_LEFT =  3125149440;
-const long iRIN_STALL =      3108437760;
-const long iRIN_BUMP_RIGHT = 3091726080;
-const long iRIN_NOPE_LEFT =  4161273600;
-const long iRIN_NOPE_BACK  = 3927310080;
-const long iRIN_NOPE_RIGHT = 4127850240;
+//Control IR numbers 3.0 UPDATE
+const long iRIN_ACTIVATION = 3409232445;
+const long iRIN_botSTOP_R =  3409195215;
+const long iRIN_botSTOP_G =  3409214085;
+const long iRIN_botSTOP_B =  3409189095;
+const long iRIN_botSTOP_RB = 3409187055;
+const long iRIN_botSTOP_RG = 3409197255;
+const long iRIN_botSTOP_BG = 3409205925;
+const long iRIN_BUMP_LEFT =  3409224285;
+const long iRIN_STALL =      3409207965;
+const long iRIN_BUMP_RIGHT = 3409240605;
+const long iRIN_NOPE_LEFT =  3409240095;
+const long iRIN_NOPE_BACK  = 3409225815;
+const long iRIN_NOPE_RIGHT = 3409219695;
 
 void stop() {
   digitalWrite(motorForwardLeft, LOW);
@@ -319,6 +323,11 @@ void sensorRead () {
   durationRight = pulseIn(echoPinRight, HIGH);
   distanceRight = durationRight * 0.034 / 2;
 
+  
+//  ULTRASONIC SENSOR DEBUG //
+//  COMMENT OUT FOR NORMAL DEBUG // 
+//////////////////////////////////
+//
 //  Serial.print("Left Sensor: ");
 //  Serial.println(distanceLeft);
 //  Serial.print("Right Sensor: ");
@@ -328,7 +337,7 @@ void sensorRead () {
 }
 
 void setup() {
-  IrReceiver.begin(irPin, ENABLE_LED_FEEDBACK); ////////// NEW <
+  IrReceiver.begin(irPin, ENABLE_LED_FEEDBACK); 
   pinMode(motorEnableLeft, OUTPUT);
   pinMode(motorForwardLeft, OUTPUT);
   pinMode(motorBackLeft, OUTPUT);
@@ -345,12 +354,11 @@ void setup() {
   pinMode(LEDgreen, OUTPUT);
   pinMode(LEDblue, OUTPUT);
   
-  IrReceiver.enableIRIn(); /////////////////////////// NEW <   
+  IrReceiver.enableIRIn();
   Serial.begin(9600);
 }
 
 void loop() {
-    /////////////////////////////////////////////////// NEW{
   if (runFlag && (millis() - activationTime) > timeout_ms) {
         stopAndSetLEDs(RED | GREEN | BLUE);
   }
@@ -360,7 +368,6 @@ void loop() {
     Serial.print("New code received: ");
     Serial.println(current_code);
     IrReceiver.resume();        
-///////////////////////////////////////////////////// NEW}
 
 
     switch (current_code) { 
@@ -375,6 +382,7 @@ void loop() {
        if (runFlag > zappedFlag) {
         Serial.println("botSTOP_RED");
         stopAndSetLEDs(RED);
+        delay(50);
        }
         break;
         
@@ -413,16 +421,8 @@ void loop() {
        }
         break;
 
-////////////////////////////////////////////////////
-// if ( runFlag ) && ( zappedFlag ) {      
-// if (( runFlag == true) && (zappedFlag == false){
-//      Set true and false to 1 0
-// if (runFlag > zappedFlag) {
-// if (runFlag < zappedFlag) {
-// if (runFlag = zappedFlag) {
-
       case iRIN_BUMP_LEFT:
-        if (runFlag > zappedFlag) {   // Replace all lines in relation [
+        if (runFlag > zappedFlag) { 
           Serial.println("BOT_BUMP_LEFT");
           BOT_Left();
           delay(500);
@@ -477,4 +477,4 @@ void loop() {
   if ( runFlag ) {
     BOT_ObstacleAvoidance();
   }
-}
+  }
