@@ -28,7 +28,7 @@
 //  current issues:
 
 //      1: needs blink without delay to happen on ledRED 
-//         after timeout_ms, till iRIN_ACTIVATION is receved 
+//         after timeout_ms, till iRIN_botACTIVATION is receved 
 //            FIX: unknown 
 //
 //    4.7.21 STATUS:
@@ -40,9 +40,6 @@
 //        line following ir sensors are working with
 //        a 10-15mm range.       
 //        function triggers on white not black.
-//      MEANING THAT THE BOUNDARIES NEED TO BE RAISED AND WHITE
-//      LIKE DOUBLE STACKED FOAM BOARD. EVERYTHING ELSE WILL 
-//      BE TOO FAR OUT OF RANGE TO DETECT OR INTERFERE 
 //
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
@@ -105,27 +102,43 @@ const int stuckDistance = 10;
 #define DECODE_NEC
 #include <IRremote.h>
 unsigned long current_code = 0;
+
+// Variables for flags
 boolean runFlag = false;
 boolean zappedFlag = true;
+// true = 1 || false = 0
+// compare using ( >=< ) 
 
 // Veritables for the TIMER
 unsigned long activationTime = 0;
-unsigned long timeout_ms = 10000;   // 1000 = 1 second
+unsigned long timeout_ms = 30000;   // 1000 = 1 second
 
 //Control IR numbers 3.0 UPDATE
-const long iRIN_ACTIVATION = 3409232445;
-const long iRIN_botSTOP_R =  3409195215;
-const long iRIN_botSTOP_G =  3409214085;
-const long iRIN_botSTOP_B =  3409189095;
-const long iRIN_botSTOP_RB = 3409187055;
-const long iRIN_botSTOP_RG = 3409197255;
-const long iRIN_botSTOP_BG = 3409205925;
-const long iRIN_BUMP_LEFT =  3409224285;
-const long iRIN_STALL =      3409207965;
-const long iRIN_BUMP_RIGHT = 3409240605;
-const long iRIN_NOPE_LEFT =  3409240095;
-const long iRIN_NOPE_BACK  = 3409225815;
-const long iRIN_NOPE_RIGHT = 3409219695;
+const long iRIN_botACTIVATION = 3409232445;
+const long iRIN_botSTOP_R =     3409195215;
+const long iRIN_botSTOP_G =     3409214085;
+const long iRIN_botSTOP_B =     3409189095;
+const long iRIN_botSTOP_RB =    3409187055;
+const long iRIN_botSTOP_RG =    3409197255;
+const long iRIN_botSTOP_BG =    3409205925;
+const long iRIN_botBumpLEFT =   3409224285;
+const long iRIN_botSTALL =      3409207965;
+const long iRIN_botBumpRIGHT =  3409240605;
+const long iRIN_botNOPEleft =   3409240095;
+const long iRIN_botNOPEback  =  3409225815;
+const long iRIN_botNOPEright =  3409219695;
+
+// Veritables for setting leds 
+void setLEDs(int colorValue) {  
+  digitalWrite(LEDblue, BLUE & colorValue);
+  digitalWrite(LEDgreen, GREEN & colorValue);
+  digitalWrite(LEDred, RED & colorValue);
+}
+
+void stopAndSetLEDs(int colorValue) {
+  stop();
+  setLEDs(colorValue);
+}
 
 void stop() {
   digitalWrite(motorForwardLeft, LOW);
@@ -136,19 +149,6 @@ void stop() {
   analogWrite(motorEnableRight, 0);
   runFlag = false;
   zappedFlag = true;
-}
-
-// colorValue should be a bitwise combination of Color values, such as
-// ( RED | BLUE ) for red and blue
-void setLEDs(int colorValue) {  
-  digitalWrite(LEDblue, BLUE & colorValue);
-  digitalWrite(LEDgreen, GREEN & colorValue);
-  digitalWrite(LEDred, RED & colorValue);
-}
-
-void stopAndSetLEDs(int colorValue) {
-  stop();
-  setLEDs(colorValue);
 }
 
 void BOT_ForwardFull () {
@@ -323,11 +323,6 @@ void sensorRead () {
   durationRight = pulseIn(echoPinRight, HIGH);
   distanceRight = durationRight * 0.034 / 2;
 
-  
-//  ULTRASONIC SENSOR DEBUG //
-//  COMMENT OUT FOR NORMAL DEBUG // 
-//////////////////////////////////
-//
 //  Serial.print("Left Sensor: ");
 //  Serial.println(distanceLeft);
 //  Serial.print("Right Sensor: ");
@@ -337,7 +332,7 @@ void sensorRead () {
 }
 
 void setup() {
-  IrReceiver.begin(irPin, ENABLE_LED_FEEDBACK); 
+//  IrReceiver.begin(irPin, ENABLE_LED_FEEDBACK); //////////////////// TEST
   pinMode(motorEnableLeft, OUTPUT);
   pinMode(motorForwardLeft, OUTPUT);
   pinMode(motorBackLeft, OUTPUT);
@@ -371,7 +366,7 @@ void loop() {
 
 
     switch (current_code) { 
-      case iRIN_ACTIVATION:
+      case iRIN_botACTIVATION:
         Serial.println("BOT ACTIVATION");
       zappedFlag = false;
         runFlag = true;
@@ -421,15 +416,15 @@ void loop() {
        }
         break;
 
-      case iRIN_BUMP_LEFT:
-        if (runFlag > zappedFlag) { 
+      case iRIN_botBumpLEFT:
+        if (runFlag > zappedFlag) {  
           Serial.println("BOT_BUMP_LEFT");
           BOT_Left();
           delay(500);
         }
         break;
         
-      case iRIN_BUMP_RIGHT:
+      case iRIN_botBumpRIGHT:
         if (runFlag > zappedFlag) {
           Serial.println("BOT_BUMP_RIGHT");
           BOT_Right();
@@ -437,7 +432,7 @@ void loop() {
         }
         break;
 
-      case iRIN_STALL:
+      case iRIN_botSTALL:
         if (runFlag > zappedFlag) {
           Serial.println("BOT_STALL");
           BOT_Back();
@@ -445,7 +440,7 @@ void loop() {
         }
         break;
 
-      case iRIN_NOPE_LEFT:
+      case iRIN_botNOPEleft:
         if (runFlag > zappedFlag) {
           Serial.println("NOPE_LEFT");
           BOT_NOPE_LEFT();
@@ -453,7 +448,7 @@ void loop() {
         }
         break;
 
-      case iRIN_NOPE_BACK:
+      case iRIN_botNOPEback:
         if (runFlag > zappedFlag) {
           Serial.println("NOOOOPE");
           BOT_NOPE_BACK();
@@ -461,7 +456,7 @@ void loop() {
         }
         break;
 
-      case iRIN_NOPE_RIGHT:
+      case iRIN_botNOPEright:
         if (runFlag > zappedFlag) {
           Serial.println("NOPE_RIGHT");
           BOT_NOPE_RIGHT();
