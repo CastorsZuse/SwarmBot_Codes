@@ -8,6 +8,7 @@
 // zappedFlag UPDATE
 // BOUNDARY DETECTION UPGRADE 
 // UPDATED DEBUG IN SERIAL MONITOR
+// ledRED DEBUG OPTION UPDATE IN SETUP
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 //
@@ -31,10 +32,6 @@
 //         after timeout_ms, till iRIN_botACTIVATION is receved 
 //            FIX: unknown 
 //
-//    4.7.21 STATUS:
-//        merged with lib update
-//                    zappedFlag
-//                    BOUNDARY DETECTION
 //
 //    4.5.21 STATUS: 
 //        line following ir sensors are working with
@@ -332,7 +329,16 @@ void sensorRead () {
 }
 
 void setup() {
-//  IrReceiver.begin(irPin, ENABLE_LED_FEEDBACK); //////////////////// TEST
+////////////////////////////////////////////////////
+/////////////////////////// DEBUG NOTE /////////////
+//         for debugging led feeback, comment out...
+
+  IrReceiver.begin(irPin, ENABLE_LED_FEEDBACK);
+  IrReceiver.begin(irPin); // <-- THIS LINE
+
+// WARNING! ledRED WILL NOT WORK IN DEBUG MODE // 
+///////////////////////////////////////////////////  
+
   pinMode(motorEnableLeft, OUTPUT);
   pinMode(motorForwardLeft, OUTPUT);
   pinMode(motorBackLeft, OUTPUT);
