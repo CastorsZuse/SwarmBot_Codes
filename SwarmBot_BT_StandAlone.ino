@@ -1,3 +1,9 @@
+// SWARM BOTS SHIELD BLUETOOTH CONTROL
+// this code will not work with the ir 
+// or ultrasonic obsticle avoidance 
+// ...yet
+//
+// See SwarmBots.online for more info
 
 //Pin numbers definition
 // Left motor pins
