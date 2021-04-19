@@ -6,9 +6,9 @@
 // UPDATED TO 3.1 irRemote LIB
 // Control IR numbers 3.0 UPDATE 
 // zappedFlag UPDATE
-// BOUNDARY DETECTION UPGRADE 
 // UPDATED DEBUG IN SERIAL MONITOR
 // ledRED DEBUG OPTION UPDATE IN SETUP
+// BLUETOOTH APP CONTROL
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 //
@@ -32,12 +32,6 @@
 //         after timeout_ms, till iRIN_botACTIVATION is receved 
 //            FIX: unknown 
 //
-//
-//    4.5.21 STATUS: 
-//        line following ir sensors are working with
-//        a 10-15mm range.       
-//        function triggers on white not black.
-//
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 //
@@ -46,10 +40,12 @@
 const int motorEnableLeft = 9;
 const int motorForwardLeft = 7;
 const int motorBackLeft = 8;
+
 // Right motor pins
 const int motorEnableRight = 11;
 const int motorForwardRight = 12;
 const int motorBackRight = 10;
+
 // Ultrasonic sensor pins
 const int trigPinFront = A1;
 const int echoPinFront = 2;
@@ -57,15 +53,17 @@ const int trigPinLeft = 3;
 const int echoPinLeft = 4;
 const int trigPinRight = 5;
 const int echoPinRight = 6;
+
 // iR receiver pin
 const int irPin = A0;
-// iR input pins
-const int boundaryDetectionLEFT_pin = A4;
-const int boundaryDetectionRIGHT_pin = A5;
-//RGB LED pins
+
+// RGB LED pins
 const int LEDred = 13;
 const int LEDgreen = A2;
 const int LEDblue = A3;
+
+// Neopixel Ring On Off pin
+const int NEOIO = A4;
 
 // Veritables for color set
 enum Color : int {
@@ -74,8 +72,12 @@ enum Color : int {
   BLUE  = 4
 };
 
+// Veriables for bluetooth
+  const int BTState = 2;
+  int state;
+
 // Veritables for iR barrier detectors
-const int THRESHOLD = 900; 
+const int THRESHOLD = 800; 
 int boundaryDetectionLEFT_STATE;
 int boundaryDetectionRIGHT_STATE;
 
@@ -90,7 +92,7 @@ int distanceFront;
 long durationLeft;
 int distanceLeft;
 long durationRight;
-int distanceRight;
+int distanceRight; 
 const int minFrontDistance = 30;
 const int minSideDistance = 20;
 const int stuckDistance = 10;
@@ -125,16 +127,33 @@ const long iRIN_botNOPEleft =   3409240095;
 const long iRIN_botNOPEback  =  3409225815;
 const long iRIN_botNOPEright =  3409219695;
 
+////Control IR numbers TEST REMOTE
+//const long iRIN_botACTIVATION = 3158572800;
+//const long iRIN_botSTOP_R =     4077715200;
+//const long iRIN_botSTOP_G =     3877175040;
+//const long iRIN_botSTOP_B =     2707357440;
+//const long iRIN_botSTOP_RB =    4144561920;
+//const long iRIN_botSTOP_RG =    3810328320;
+//const long iRIN_botSTOP_BG =    2774204160;
+//const long iRIN_botBumpLEFT =   3125149440;
+//const long iRIN_botSTALL =      3108437760;
+//const long iRIN_botBumpRIGHT =  3091726080;
+//const long iRIN_botNOPEleft =   4161273600;
+//const long iRIN_botNOPEback  =  3927310080;
+//const long iRIN_botNOPEright =  4127850240;
+
+
 // Veritables for setting leds 
-void setLEDs(int colorValue) {  
+void setLEDs(int colorValue, bool neoValue) {
   digitalWrite(LEDblue, BLUE & colorValue);
   digitalWrite(LEDgreen, GREEN & colorValue);
   digitalWrite(LEDred, RED & colorValue);
+  digitalWrite(NEOIO, neoValue);
 }
 
 void stopAndSetLEDs(int colorValue) {
   stop();
-  setLEDs(colorValue);
+  setLEDs(colorValue, false);
 }
 
 void stop() {
@@ -155,7 +174,7 @@ void BOT_ForwardFull () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | GREEN | BLUE);
+  setLEDs(RED | GREEN | BLUE, true);
 }
 
 void BOT_Left () {
@@ -165,7 +184,7 @@ void BOT_Left () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, 0);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(GREEN);
+  setLEDs(GREEN, true);
 }
 
 void BOT_Right () {
@@ -175,7 +194,7 @@ void BOT_Right () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, 0);
-  setLEDs(GREEN);
+  setLEDs(GREEN, true);
 }
 
 void BOT_Back () {
@@ -185,7 +204,26 @@ void BOT_Back () {
   digitalWrite(motorBackRight, HIGH);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(BLUE);
+  setLEDs(BLUE, true);
+}
+void BOT_Back_Right () {
+  digitalWrite(motorForwardLeft, LOW);
+  digitalWrite(motorBackLeft, HIGH);
+  digitalWrite(motorForwardRight, LOW);
+  digitalWrite(motorBackRight, LOW);
+  analogWrite(motorEnableLeft, leftMotorSpeed);
+  analogWrite(motorEnableRight, 0);
+  setLEDs(BLUE | GREEN, true);
+}
+
+void BOT_Back_Left () {
+  digitalWrite(motorForwardLeft, LOW);
+  digitalWrite(motorBackLeft, LOW);
+  digitalWrite(motorForwardRight, LOW);
+  digitalWrite(motorBackRight, HIGH);
+  analogWrite(motorEnableLeft, 0);
+  analogWrite(motorEnableRight, rightMotorSpeed);
+  setLEDs(BLUE | GREEN, true);
 }
 
 void BOT_NOPE_LEFT () {
@@ -195,7 +233,7 @@ void BOT_NOPE_LEFT () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | GREEN);
+  setLEDs(RED | GREEN, true);
 }
 
 void BOT_NOPE_BACK () {
@@ -205,7 +243,7 @@ void BOT_NOPE_BACK () {
   digitalWrite(motorBackRight, LOW);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | BLUE);
+  setLEDs(RED | BLUE, true);
 }
 
 void BOT_NOPE_RIGHT () {
@@ -215,51 +253,12 @@ void BOT_NOPE_RIGHT () {
   digitalWrite(motorBackRight, HIGH);
   analogWrite(motorEnableLeft, leftMotorSpeed);
   analogWrite(motorEnableRight, rightMotorSpeed);
-  setLEDs(RED | GREEN);
+  setLEDs(RED | GREEN, true);
 }
 
 void BOT_ObstacleAvoidance (){
              BOT_ForwardFull();
              sensorRead ();
-
-////////////////////////////////////////////////////////////////////
-/////////////// LINE FOLLOWING SENSOR AI TREE /////////////////////
-///////////////////////////////////////////////////////////////////
-
-//        (boundaryDetectionRIGHT_STATE > THRESHOLD && 
-//          boundaryDetectionLEFT_STATE < THRESHOLD){
-//          if the right sensor is high
-//             and left sensor is low
-//             bot will turn right 
-//          function triggetrs on white 
-//          delay 2 x 150
-////////////////////////////////////////////////////////////////
-
-          boundaryDetectionLEFT_STATE = analogRead(boundaryDetectionLEFT_pin);
-          boundaryDetectionRIGHT_STATE = analogRead(boundaryDetectionRIGHT_pin);
-
-      if(boundaryDetectionRIGHT_STATE > THRESHOLD && 
-          boundaryDetectionLEFT_STATE < THRESHOLD){
-        Serial.println("iR BOUNDARY DETECTED LEFT, TURN RIGHT");
-           BOT_Right();
-             delay(2*delayTime);
-  }  
-      if(boundaryDetectionRIGHT_STATE < THRESHOLD && 
-         boundaryDetectionLEFT_STATE > THRESHOLD){
-        Serial.println("iR BOUNDARY DETECTED RIGHT, TURN LEFT");
-           BOT_Left();
-            delay(2*delayTime);
-   }
-      if(boundaryDetectionRIGHT_STATE < THRESHOLD && 
-         boundaryDetectionLEFT_STATE < THRESHOLD) { 
-        Serial.println("iR BOUNDARY DETECTED FRONT, TURN AROUND");
-          BOT_NOPE_BACK();
-            delay(800);
-  }
-
-////////////////////////////////////////////////////////////////////
-/////////////// LINE FOLLOWING SENSOR AI TREE /////////////////////
-///////////////////////////////////////////////////////////////////
   
   if ((distanceFront <= minFrontDistance) ||
       (distanceLeft <= minSideDistance) ||
@@ -354,12 +353,48 @@ void setup() {
   pinMode(LEDred, OUTPUT);
   pinMode(LEDgreen, OUTPUT);
   pinMode(LEDblue, OUTPUT);
-  
+  pinMode(BTState, INPUT);
+  pinMode(NEOIO, OUTPUT);
   IrReceiver.enableIRIn();
   Serial.begin(9600);
 }
 
 void loop() {
+  /////////////////////////////////////// Bluetooth Functions
+///////////////////////////////////////////////////////////
+    if(Serial.available() > 0){     
+      state = Serial.read();   
+    }
+      if (state == 'F') {
+        BOT_ForwardFull();
+    }
+        else if (state == 'B') {
+          BOT_Back();
+    }
+          else if (state == 'L') {
+            BOT_NOPE_LEFT();
+    }
+            else if (state == 'R') {
+              BOT_NOPE_RIGHT();
+    }
+              else if (state == 'G') {
+                BOT_Left();
+              }
+                else if (state == 'I') {
+                  BOT_Right();
+                }
+                  else if (state == 'H') {
+                    BOT_Back_Left();
+                  }
+                    else if (state == 'J') {
+                      BOT_Back_Right();
+                    }
+                  else if (state == 'S'){     
+                    stop();
+    }
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+
   if (runFlag && (millis() - activationTime) > timeout_ms) {
         stopAndSetLEDs(RED | GREEN | BLUE);
   }
