@@ -14,7 +14,6 @@
 //
 // CONCEPT AND DESIGN BY: Nolan Cash
 // WRITEN BY: Nolan Cash
-// CoWRITEN BY: Andy Tracy
 // SPECIAL THANKS TO:
 //      Justus Stahler
 //      Christian Restifo
@@ -110,24 +109,24 @@ boolean zappedFlag = true;
 
 // Veritables for the TIMER
 unsigned long activationTime = 0;
-unsigned long timeout_ms = 30000;   // 1000 = 1 second
+unsigned long timeout_ms = 90000;   // 1000 = 1 second
 
-//Control IR numbers 3.0 UPDATE
-const long iRIN_botACTIVATION = 3409232445;
-const long iRIN_botSTOP_R =     3409195215;
-const long iRIN_botSTOP_G =     3409214085;
-const long iRIN_botSTOP_B =     3409189095;
-const long iRIN_botSTOP_RB =    3409187055;
-const long iRIN_botSTOP_RG =    3409197255;
-const long iRIN_botSTOP_BG =    3409205925;
-const long iRIN_botBumpLEFT =   3409224285;
-const long iRIN_botSTALL =      3409207965;
-const long iRIN_botBumpRIGHT =  3409240605;
-const long iRIN_botNOPEleft =   3409240095;
-const long iRIN_botNOPEback  =  3409225815;
-const long iRIN_botNOPEright =  3409219695;
+////Control IR numbers 3.0 UPDATE
+//const long iRIN_botACTIVATION = 3409232445;
+//const long iRIN_botSTOP_R =     3409195215;
+//const long iRIN_botSTOP_G =     3409214085;
+//const long iRIN_botSTOP_B =     3409189095;
+//const long iRIN_botSTOP_RB =    3409187055;
+//const long iRIN_botSTOP_RG =    3409197255;
+//const long iRIN_botSTOP_BG =    3409205925;
+//const long iRIN_botBumpLEFT =   3409224285;
+//const long iRIN_botSTALL =      3409207965;
+//const long iRIN_botBumpRIGHT =  3409240605;
+//const long iRIN_botNOPEleft =   3409240095;
+//const long iRIN_botNOPEback  =  3409225815;
+//const long iRIN_botNOPEright =  3409219695;
 
-////Control IR numbers TEST REMOTE
+////Control IR numbers TEST REMOTE SILVER
 //const long iRIN_botACTIVATION = 3158572800;
 //const long iRIN_botSTOP_R =     4077715200;
 //const long iRIN_botSTOP_G =     3877175040;
@@ -141,6 +140,21 @@ const long iRIN_botNOPEright =  3409219695;
 //const long iRIN_botNOPEleft =   4161273600;
 //const long iRIN_botNOPEback  =  3927310080;
 //const long iRIN_botNOPEright =  4127850240;
+
+//Control IR numbers TEST REMOTE BLACK
+const long iRIN_botACTIVATION = 3125149440; // POWER
+const long iRIN_botSTOP_R =     3091726080; // STOP
+const long iRIN_botSTOP_G =     4077715200; // ONE
+const long iRIN_botSTOP_B =     3877175040; // TWO
+const long iRIN_botSTOP_RB =    2707357440; // THREE
+const long iRIN_botSTOP_RG =    4144561920; // FOUR
+const long iRIN_botSTOP_BG =    3810328320; // FIVE
+const long iRIN_botBumpLEFT =   3141861120; // |<<
+const long iRIN_botSTALL =      3208707840; // >||
+const long iRIN_botBumpRIGHT =  3158572800; // >>|
+const long iRIN_botNOPEleft =   4161273600; // UP
+const long iRIN_botNOPEback  =  3927310080; // VOL-
+const long iRIN_botNOPEright =  4127850240; // DOWN
 
 
 // Veritables for setting leds 
